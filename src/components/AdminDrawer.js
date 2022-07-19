@@ -1,25 +1,28 @@
-import React from 'react';
+import React from "react";
 import { useHistory } from "react-router-dom";
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import Button from '@mui/material/Button';
-import HomeIcon from '@material-ui/icons/Home'
-import ListIcon from '@material-ui/icons/List'
-import { ListItemIcon } from '@mui/material';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import Button from "@mui/material/Button";
+import HomeIcon from "@material-ui/icons/Home";
+import ListIcon from "@material-ui/icons/List";
+import { ListItemIcon } from "@mui/material";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 
 export default function AdmninDrawer() {
   const history = useHistory();
 
   const [state, setState] = React.useState({
-    left: false
+    left: false,
   });
 
   const toggleDrawer = (anchor, open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
       return;
     }
 
@@ -28,12 +31,12 @@ export default function AdmninDrawer() {
 
   const onNavigate = (e) => {
     e.preventDefault();
-    history.push('/userlist')
+    history.push("/userlist");
   };
 
   const onUsersList = (e) => {
     e.preventDefault();
-    history.push('/dashboard')
+    history.push("/dashboard");
   };
 
   const list = (anchor) => (
@@ -43,22 +46,30 @@ export default function AdmninDrawer() {
       onClick={toggleDrawer(anchor, false)}
       onKeyDown={toggleDrawer(anchor, false)}
     >
-      <List style={{backgroundColor:'#EEE',width:'300px'}}>
+      <List style={{ backgroundColor: "#EEE", width: "300px" }}>
         <ListItem button>
-          <ListItemText primary={'demo'} />
-        </ListItem>   
-        <ListItem button  onClick={onNavigate}>
+          <ListItemText primary={"demo"} />
+        </ListItem>
+        <ListItem button onClick={onNavigate}>
           <ListItemIcon>
-            <ListIcon style={{color:'#B0C6BB',width:'30px',height:'45px'}}> </ListIcon>
+            <ListIcon
+              style={{ color: "#B0C6BB", width: "30px", height: "45px" }}
+            >
+              {" "}
+            </ListIcon>
           </ListItemIcon>
-          <ListItemText primary={'Users List'} />
-        </ListItem>   
+          <ListItemText primary={"Users List"} />
+        </ListItem>
         <Divider />
-        <ListItem button  onClick={onUsersList}>
+        <ListItem button onClick={onUsersList}>
           <ListItemIcon>
-            <HomeIcon style={{color:'#B0C6BB',width:'30px',height:'45px'}}> </HomeIcon>
+            <HomeIcon
+              style={{ color: "#B0C6BB", width: "30px", height: "45px" }}
+            >
+              {" "}
+            </HomeIcon>
           </ListItemIcon>
-          <ListItemText primary={'House List'} />
+          <ListItemText primary={"House List"} />
         </ListItem>
       </List>
     </Box>
@@ -67,16 +78,20 @@ export default function AdmninDrawer() {
   return (
     <div>
       {
-        <React.Fragment key={'left'}>
-          <Button onClick={toggleDrawer('left', true)}>
-            <HomeIcon style={{color:'#B0C6BB',width:'40px',height:'30px'}}> </HomeIcon>
+        <React.Fragment key={"left"}>
+          <Button onClick={toggleDrawer("left", true)}>
+            <HomeIcon
+              style={{ color: "#B0C6BB", width: "40px", height: "30px" }}
+            >
+              {" "}
+            </HomeIcon>
           </Button>
           <Drawer
-            anchor={'left'}
-            open={state['left']}
-            onClose={toggleDrawer('left', false)}
+            anchor={"left"}
+            open={state["left"]}
+            onClose={toggleDrawer("left", false)}
           >
-            {list('left')}
+            {list("left")}
           </Drawer>
         </React.Fragment>
       }

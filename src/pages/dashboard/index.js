@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react'
-import UserDashboard from './User-dashboard/UserDashboard'
-import AdminDashboard from './Admin-dashboard/AdminDashboard'
+import React, { useEffect, useState } from "react";
+import UserDashboard from "./User-dashboard/UserDashboard";
+import AdminDashboard from "./Admin-dashboard/AdminDashboard";
 import backEndApi from "../../services/api";
 import Loader from "./User-dashboard/Loader";
-import {Redirect} from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 // const useStyles = theme => ({
 //     root: {
@@ -39,60 +39,49 @@ import {Redirect} from "react-router-dom";
 //     },
 // });
 
+export default function Dashboard(props) {
+  const [auth, setAuth] = useState("");
+  const [isAuth, setIsAuth] = useState(true);
 
-export default function Dashboard(props){
-    const [auth, setAuth] = useState('')
-    const [isAuth, setIsAuth] = useState(true)
-
-    const authenticate = () => {
-
-        if (auth === "Admin") {
-            return <AdminDashboard {...props} getToken={props.getToken}/>
-        } else if (auth === "User") {
-            return <UserDashboard getToken={props.getToken}/>
-        } else if (auth === '') {
-
-            return <div>
-                <Loader/>
-            </div>
-
-        }
-    };
-
-    useEffect( () => {
-      const  checkLocalStorage=async()=>{
-            if (localStorage.getItem(('token'))) {
-
-                const config = {
-                    headers: {
-                        'x-access-token': JSON.parse(localStorage.getItem('token')).token
-                    }
-                };
-                const response = await backEndApi.get('/dashboard', config);
-                console.log(response.data);
-
-
-                setAuth(response.data.auth);
-            } else {
-                setIsAuth(false)
-            }
-        }
-        checkLocalStorage()
-    }, []);
-
-    useEffect(() => {
-        if (!isAuth) {
-            return <Redirect to='/'/>
-        }
-    }, [isAuth])
-
-    return (
+  const authenticate = () => {
+    if (auth === "Admin") {
+      return <AdminDashboard {...props} getToken={props.getToken} />;
+    } else if (auth === "User") {
+      return <UserDashboard getToken={props.getToken} />;
+    } else if (auth === "") {
+      return (
         <div>
-
-            {authenticate()}
-
+          <Loader />
         </div>
-    );
+      );
+    }
+  };
 
+  useEffect(() => {
+    const checkLocalStorage = async () => {
+      if (localStorage.getItem("token")) {
+        const config = {
+          headers: {
+            "x-access-token": JSON.parse(localStorage.getItem("token")).token,
+          },
+        };
+        const response = await backEndApi.get("/dashboard", config);
+        console.log(response.data);
+
+        setAuth(response.data.auth);
+        console.log(response.data);
+      } else {
+        setIsAuth(false);
+      }
+    };
+    checkLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    if (!isAuth) {
+      return <Redirect to="/" />;
+    }
+  }, [isAuth]);
+
+  return <div>{authenticate()}</div>;
 }
-
