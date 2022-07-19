@@ -11,7 +11,7 @@ import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 
-export default function AdmninDrawer() {
+export default function AdminDrawer() {
   const history = useHistory();
 
   const [state, setState] = React.useState({
