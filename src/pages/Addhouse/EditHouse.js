@@ -1,17 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Grid, Typography, withStyles} from '@material-ui/core';
 import {Redirect} from "react-router-dom";
-
-import DatePicker from "react-datepicker";
+import {DropzoneArea} from 'material-ui-dropzone';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import smallhouse from '../images/upright.png';
+import './inputlocation.css';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
 import "react-datepicker/dist/react-datepicker.css";
 import backEndApi from '../../services/api';
 import moment from "moment";
 import Container from "@material-ui/core/Container";
+import DatePicker from "react-datepicker";
 
 const useStyles = theme => ({
     root: {
-        marginTop: '20px',
-        marginLeft: '16px',
         "& input[type=number]": {
             "&::-webkit-inner-spin-button": {
                 '-webkit-appearance': 'none',
@@ -24,43 +30,42 @@ const useStyles = theme => ({
         "& .MuiTypography-body2": {
             fontWeight: 800
         },
+        
+          "& .MuiFormLabel-root": {
+           
+            fontWeight:600,
+            fontSize:14,
+            marginTop:-7,
+           
+           
+            color:'#3378BE'
+          },
         "& form":{
-           padding:'40px',
-            [theme.breakpoints.down('sm')]:{
-               padding:'0'
+
+            /*[theme.breakpoints.down('sm')]:{
+                padding:'0'
+            }*/
+        },
+        "@media (max-width:600px)":{
+            "& form":{
+                padding:'0px',
             }
-        }
+        },
     },
     firstGrid: {
-        background: '#EEEEEE',
-        boxShadow: '-9px 18px 16px rgba(0, 0, 0, 0.05)',
+        background: 'white',
+        boxShadow: '-9px 18px 16px rgba(.50, .5, .5, 0.05)',
         borderRadius: '5px',
+        
     },
+    
 
     input: {
         padding: '10px',
         marginTop: '5px',
         width: '100%',
         height: '40px',
-        borderRadius: '5px',
-        border: '0.5px solid #9e9e9e',
-        background: '#EEEEEE',
-        "&::-webkit-input-placeholder": {
-            color: 'rgba(57,50,50,0.3)'
-        },
-
-        "&::-moz-placeholder": { /* Firefox 19+ */
-            color: 'rgba(57,50,50,0.3)'
-
-        },
-        "&:-ms-input-placeholder": { /* IE 10+ */
-            color: 'rgba(57,50,50,0.3)'
-
-        },
-        "&:-moz-placeholder": { /* Firefox 18- */
-            color: 'rgba(57,50,50,0.3)'
-
-        },
+       
 
     },
     dataPicker: {
@@ -71,6 +76,43 @@ const useStyles = theme => ({
 
 
     },
+    
+    leadertitle:{
+        color:'#3378BE',
+        marginBottom:'15px'
+    },
+    addhouseimage:{
+        position:"absolute",
+        top: 320,
+        left: 70,
+        width:400,
+        "@media (max-width:1220px)":{
+               
+                left: 45,
+                width:300,
+            },
+            "@media (max-width:960px)":{
+           
+                display:'none',
+            },
+        },
+        options :{
+            color:'white',
+           
+            
+            paddingLeft:'25px',
+            paddingRight:'25px',
+            borderRadius:'8px',
+            paddingTop:'6px',
+            paddingBottom:'6px',
+            cursor:'pointer',
+            
+
+            
+        },
+        
+    
+
     textarea: {
         padding: '10px',
         resize: 'none',
@@ -78,7 +120,7 @@ const useStyles = theme => ({
         background: '#EEEEEE',
         border: '0.5px solid #9e9e9e',
         borderRadius: '5px',
-        height: '120px',
+        height: '125px',
         "&::-webkit-input-placeholder": {
             color: 'rgba(57,50,50,0.3)'
         },
@@ -87,6 +129,7 @@ const useStyles = theme => ({
             color: 'rgba(57,50,50,0.3)'
 
         },
+        
         "&:-ms-input-placeholder": { /* IE 10+ */
             color: 'rgba(57,50,50,0.3)'
 
@@ -95,19 +138,75 @@ const useStyles = theme => ({
             color: 'rgba(57,50,50,0.3)'
 
         },
+        "@media (max-width:960px)":{
+               
+        
+            width:'100%',
+        },
+        
     },
     inputsContainer: {
-        margin: '15px'
+        margin: '30px'
     },
+    headertitle:{
+        color: 'black',
+        fontWeight:'bold',
+        display:'flex',
+        
+        justifyContent:'center',
+        marginRight:'40px',
+        padding:'10px'
+
+    },
+    buttons:{
+        display:'flex',
+        width:'100%',
+        justifyContent:'center',
+        alignItems:'center',
+        gap:'50px',
+        
+    },
+    buttonone:{
+        
+        paddingLeft: '40px', paddingRight: '40px', background: '#3293A8',paddingTop:'5px', paddingBottom:'5px',
+        borderRadius: '5px', marginLeft: '15px', color: '#fff', textTransform: 'none',
+
+        "@media (max-width:980px)":{
+            
+          
+            paddingLeft: '50px', paddingRight: '50px',
+            
+
+        }, 
+        "&:hover": {
+            color: 'red'
+        },
+        
+    },
+    
     dropZone: {
         "& .MuiDropzoneArea-root": {
             background: '#EEEEEE',
             marginBottom: '30px',
             maxHeight: '343',
+            width:'150%',
+            padding:'10px',
+            borderRadius:'10px',
 
             border: '.5px solid #9e9e9e',
+            "@media (max-width:960px)":{
+               
+             
+                width:'100%',
+            },
+            "@media (max-width:460px)":{
+               
+             
+                width:'17rem',
+            },
 
         },
+    
         /*"& .MuiTypography-h5": {
             fontSize: '14px',
             fontWeight: 'normal'
@@ -123,36 +222,15 @@ const useStyles = theme => ({
             color: "#9e9e9e"
         }*/
     },
+    imageleader:{
+        width:'80%',
+        },
     inputError: {
         color: 'red',
-        fontSize: '14px',
+        fontSize: '13px',
         display: 'none',
+        fontWeight:'normal'
     },
-    /*dropZone: {
-        "& .MuiDropzoneArea-root": {
-            background: '#F2EDD7',
-            marginBottom: '30px',
-            maxHeight: '243',
-            height: '210px',
-            minHeight: '200px',
-            border: '.5px solid rgba(228, 130, 87, 0.8)',
-
-        },
-        "& .MuiTypography-h5": {
-            fontSize: '14px',
-            fontWeight: 'normal'
-        },
-        "& .MuiDropzoneArea-text": {
-            marginTop: '130px',
-            color: '#005CC8'
-        },
-        "& .MuiSvgIcon-root": {
-            display: 'flex',
-            marginTop: '-100px',
-            marginLeft: '110px',
-            color: "#005CC8"
-        }
-    },*/
 });
 let otherArray = [];
 
@@ -174,12 +252,12 @@ function EditHouse(props) {
     const [editedEncodedAvatarUrl, setEditedEncodedAvatarUrl] = useState('');
     const [listingStatus, setListingStatus] = useState('');
     const [reviewStatus, setReviewStatus] = useState('');
-    const [file ] = useState([]);
+    const [file, setFile ] = useState([]);
     const [isRedirectToHomepage, setIsRedirectToHomepage] = useState('');
 
     useEffect(() => {
 
-
+        
         const loadData = async () => {
 
             const {data} = await backEndApi.get('./edithouse', {params: {id: props.match.params.id}});
@@ -198,7 +276,7 @@ function EditHouse(props) {
                 return otherArray
             };
 
-            console.log(imagesImage(), 'and what')
+            console.log(imagesImage(), 'and and and what')
             setOwnerEmail(data.docs.ownerEmail)
             setOriginalHouseId(data.docs._id)
             setLocation(data.docs.location)
@@ -211,15 +289,17 @@ function EditHouse(props) {
             setDescription(data.docs.description)
             setAvailabilityDate(data.docs.availabilityDate)
             setListingStatus(data.docs.listingStatus)
+            setFile(data.docs.File)
             setReviewStatus(data.docs.reviewStatus)
             setEditedEncodedAvatarUrl(data.docs.encodedAvatarUrl)
+            console.log(data, 'data will be data')
 
         };
         loadData();
 
     }, [props.match.params.id, setEditedEncodedAvatarUrl, setTheDocs])
 
-
+    
     const onFormSubmit = (e) => {
         e.preventDefault();
 
@@ -243,6 +323,20 @@ function EditHouse(props) {
 
         return e.currentTarget.value;
     };
+    const submitEditHouseApiRequest = async (newLaunchDetails) => {
+        /*let user = props.getToken();*/
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        let response = await backEndApi.post('/editHouseUpdate', {params: newLaunchDetails});
+        /*let resImage = await backEndApi.post('/uploadProductImage', formData, config);*/
+
+
+        console.log("The files and Image success fully uploaded" + response);
+        setIsRedirectToHomepage(true)
+
+    };
     const validateForm = (e) => {
 
 
@@ -259,10 +353,11 @@ function EditHouse(props) {
             monthlyPayment: parseInt(monthlyPayment),
             phoneNumber: parseInt(phoneNumber),
             guest_house: guestHouse === 'yes',
-            availabilityDate: availabilityDate,
+            availabilityDate: moment(availabilityDate).format("DD-MM-YYYY"),
             listingStatus: listingStatusFilter(e),
             reviewStatus: reviewStatusFilter(e)
         };
+        
 
         if (!location) {
             document.getElementById('locationError').style.display = 'block';
@@ -295,33 +390,26 @@ function EditHouse(props) {
         if (location &&
             floor && monthlyPayment
             && bedRoom
-            && phoneNumber) {
-
+            && phoneNumber ) {
+            console.log('come 3 ');
+            console.log(product, 'products')
             submitEditHouseApiRequest(product);
-
-        } else {
+            // pass the product as props
+        } 
+        
+        else {
             //for not yet validated
-            console.log("Form Not Validated")
+            console.log('come 4 ');
+          
 
         }
 
+      
+
 
     };
 
-    const submitEditHouseApiRequest = async (newLaunchDetails) => {
-        /*let user = props.getToken();*/
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        let response = await backEndApi.post('/editHouseUpdate', {params: newLaunchDetails});
-        /*let resImage = await backEndApi.post('/uploadProductImage', formData, config);*/
-
-
-        console.log("The files and Image success fully uploaded" + response);
-        setIsRedirectToHomepage(true)
-
-    };
+    
 
     const choseButton = () => {
 
@@ -344,7 +432,7 @@ function EditHouse(props) {
                     return <React.Fragment>
 
                         <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
+                            paddingLeft: '0px', paddingRight: '50px', background: '#005CC8',
                             borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
                         }}> Update Detail</Button>
 
@@ -414,14 +502,11 @@ function EditHouse(props) {
             case 'Submitted' :
                 if (reviewStatus === "Pending" || reviewStatus === "Rejected") {
                     return <React.Fragment>
-                        <Button onClick={onFormSubmit} value='NA' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
+                        <Button onClick={onFormSubmit} value='NA' className={classes.buttonone} variant='contained' style={{
+                            
                         }}>Cancel Review</Button>
-                        <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        <Button onClick={onFormSubmit} value='Pending' className={classes.buttonone} variant='contained' style={{
+                        }}> Update</Button>
 
                     </React.Fragment>;
                 } else if (reviewStatus === "Approved") {
@@ -429,7 +514,7 @@ function EditHouse(props) {
                         <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
                             paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
                             borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        }}> update review</Button>
 
                     </React.Fragment>
                 } else {
@@ -441,7 +526,7 @@ function EditHouse(props) {
                         <Button onClick={onFormSubmit} value='Submitted' variant='contained' style={{
                             paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
                             borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        }}> Next</Button>
 
                     </React.Fragment>
                 }
@@ -493,6 +578,15 @@ function EditHouse(props) {
         }
         setBedRoom(e.target.value)
     };
+   const  onDropZoneChange = (e) => {
+        if (e[0]) {
+            document.getElementById('dropZoneImage').style.display = 'none';
+
+        }
+
+        setFile({file: e});
+
+    };
     const onGuestHouseChanged = (e) => {
 
         if (e.target.value.length === 0) {
@@ -522,7 +616,7 @@ function EditHouse(props) {
     };
     const onAvailabilityChanged = (date) => {
 
-        console.log(date);
+        console.log(date, 'here is the date');
         if (date === null) {
             document.getElementById('availabilityError').style.display = 'block';
 
@@ -544,201 +638,274 @@ function EditHouse(props) {
     if (isRedirectToHomepage) {
         return <Redirect to='/dashboard'/>
     }
+    
     return (
-        <Container>
-            <Container className={classes.root}>
-            <Typography variant='h5' style={{marginBottom: '30px', marginTop: '35px', marginLeft: '-15px'}}>Edit
-                House</Typography>
+        <Container >
+            <Container className={classes.root} maxWidth='md'>
+            
 
-            <Grid container className={classes.firstGrid} spacing={4}>
-                <Grid item xs={12} md={6}>
-                    <form>
-                        <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>Location of the Condominium</Typography>
-                            <input type="text" list='locationOfCondominium' name='Myname'
-                                   placeholder='Enter Location of the condominium'
-                                   className={classes.input}
-                                   onChange={onLocationChanged}
-                                   value={location}
+            <Grid container className={classes.firstGrid} alignItems='center' justifyContent='center' spacing={1} >
+                <Grid item xs={12} md={6} alignItems='center' justifyContent='center'>
+                    <form  >
 
-                            />
-                            <datalist id="locationOfCondominium">
-                                <option value="Ayat Condominium"/>
-                                <option value="Yeka Abado Condominium"/>
-                                <option value="Submit Condominium"/>
-                                <option value="Gelan Condominium"/>
-                                <option value="Tuludimtu Condominium"/>
-                                <option value="4 killo Condominium"/>
-                                <option value="Gotera Condominium"/>
-                                <option value="Balderas Condominium"/>
-                                <option value="Mebrathail Condominium"/>
-                            </datalist>
+                        <div className={classes.headertitle}>
+                            <div className="subone">
+                                <img src={smallhouse} alt=""  className={classes.imageleader}/>
+                            </div>
+                            <div className="subtwo">
+                                 <Typography variant='h5' style={{marginBottom: '30px', marginTop: '35px', marginLeft: '-15px'}}>Edit House</Typography>
+                            </div>
+
+                           
+                           
+                            
+
+                        </div>
+                    
+                        <div  className={classes.inputsContainer}>
+                                {/* <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label"  >Enter Location</InputLabel>
+                                    <Select
+                                    
+                                        labelId="demo-simple-select-label"
+                                        sx={{height:40}}
+                                        label="Enter Location"
+                                        list='locationOfCondominium'
+                                        id="location"
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start"><span><i class='fas fa-map-marker-alt'></i></span></InputAdornment>,
+                                            className: classes.input
+                                        }}
+                                        
+                                        name='Myname'
+                                        placeholder='Location of the condominium'
+                                        onChange={onLocationChanged}
+                                        value={location}
+                                       
+                                    >   
+                                        <TextField id="standard-basic"  variant="standard" />
+                                        <MenuItem value="Ayat Condominium">Ayat Condominium</MenuItem>
+                                        <MenuItem value="Yeka Abado Condominium">Yeka Abado Condominium</MenuItem>
+                                        <MenuItem value="Sumit Condominium">Sumit Condominium</MenuItem>
+                                        <MenuItem value="Gelan Condominium">Gelan Condominium</MenuItem>
+                                        <MenuItem value="Tuludimtu Condominium">Tuludimtu Condominium</MenuItem>
+                                        <MenuItem value="4 killo Condominium">4 killo Condominium</MenuItem>
+                                        <MenuItem value="Gotera Condominium">Gotera Condominium</MenuItem>
+                                        <MenuItem value="Balderas Condominium">Balderas Condominium</MenuItem>
+                                        <MenuItem value="Mebrathail Condominium">Mebrathail Condominium</MenuItem>
+                                    </Select>
+                                </FormControl> */}
+
+                                <input type="text" list='locationOfCondominium' id="location" name='Myname'
+                                       
+                                       className='form__input'
+                                       placeholder='Location of condominium'
+                                       onChange={onLocationChanged}
+                                       value={location}
+                                />
+                                <div className="form__label">
+                                    <label htmlFor="location" className='form__labels'>Location</label>
+                                </div>
+                                
+                                <datalist id="locationOfCondominium">
+                                    <option value="Ayat Condominium"/>
+                                    <option value="Yeka Abado Condominium"/>
+                                    <option value="Submit Condominium"/>
+                                    <option value="Gelan Condominium"/>
+                                    <option value="Tuludimtu Condominium"/>
+                                    <option value="4 killo Condominium"/>
+                                    <option value="Gotera Condominium"/>
+                                    <option value="Balderas Condominium"/>
+                                    <option value="Mebrathail Condominium"/>
+                                </datalist>
 
                             <Typography variant='body2' id='locationError' className={classes.inputError}>You have
-                                to
-                                entered Location of your condominium.</Typography>
+                                to entered Location of your condominium.</Typography>
 
                         </div>
                         <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>Bed Rooms</Typography>
-                            <select className={classes.input} value={bedRoom}
-                                    onChange={onBedroomChanged}>
-                                <option value="Select Bed Rooms" disabled selected>Select Bed Rooms
-                                </option>
-                                <option value='1'>0 (studio)</option>
-                                <option value='1'>1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-
-                            </select>
-
+                            <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label"  >Bedroom</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        sx={{height:40}}
+                                        value={bedRoom}
+                                        label="Bedroom"
+                                        onChange={onBedroomChanged}
+                                        name="selectNumberOfBedrooms"
+                                    >
+                                        <MenuItem value='1'>0 (studio)</MenuItem>
+                                        <MenuItem value='1'>1</MenuItem>
+                                        <MenuItem value="2">2</MenuItem>
+                                        <MenuItem value="3">3</MenuItem>
+                                    </Select>
+                            </FormControl>
                             <Typography type='number' variant='body2' id='bedRoomError'
                                         className={classes.inputError}>You have
                                 to enter number of bed rooms.</Typography>
 
                         </div>
                         <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>Floor</Typography>
-
-                            <select className={classes.input} value={floor}
-                                    onChange={onFloorchanged}>
-                                <option value="Select Floor" disabled selected>Select Floor
-                                </option>
-                                <option value='0'>ground</option>
-                                <option value='1'>+1</option>
-                                <option value="2">+2</option>
-                                <option value="3">+3</option>
-                                <option value="4">+4</option>
-                                <option value="5">+5</option>
-                                <option value="6">+6</option>
-
-                            </select>
+                            <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label"  >Select Floor</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        sx={{height:40}}
+                                        label="Select Floor"
+                                        value={floor}
+                                        onChange={onFloorchanged}
+                                        name="selectNumberOfBedrooms"
+                                    >
+                                        <MenuItem value='0'>ground</MenuItem>
+                                        <MenuItem value='1'>+1</MenuItem>
+                                        <MenuItem value="2">+2</MenuItem>
+                                        <MenuItem value="3">+3</MenuItem>
+                                        <MenuItem value="4">+4</MenuItem>
+                                        <MenuItem value="5">+5</MenuItem>
+                                        <MenuItem value="6">+6</MenuItem>
+                                    </Select>
+                            </FormControl>
                             <Typography variant='body2' id='floorError' className={classes.inputError}>you have
                                 to
                                 select floor.</Typography>
                         </div>
+                        
                         <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>Monthly Payment</Typography>
-                            <input type="number" min='0' placeholder='eg, 5000' className={[classes.input]}
-                                   onChange={onMonthlyPaymentChanged}
-                                   value={monthlyPayment}
-
-
+                            <TextField
+                                label="Monthly payment"
+                               
+                                className={classes.input}
+                                onChange={onMonthlyPaymentChanged}
+                                value={monthlyPayment}
+                                placeholder='eg, 5000'
+                                
+                                
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"><span><i class='fas fa-dollar-sign'></i></span></InputAdornment>,
+                                    className: classes.input
+                                }}
                             />
                             <Typography variant='body2' id='monthlyPaymentError' className={classes.inputError}>you
                                 have to
                                 enter monthly payment.</Typography>
 
                         </div>
-
                         <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>Short description <span
-                                style={{opacity: '0.5'}}>(optional)</span></Typography>
-                            <textarea className={classes.textarea} placeholder='Enter short description...'
-                                      style={{marginTop: '5px',}} onChange={onDescriptionChanged}
-                                      value={description}
-                            />
+                                    <input name="SquareMeter" type="text" list='squareMetersInput'
+                                    placeholder='Square meter of your house' className='form__input'
+                                    onChange={onSquareMeterChanged}
+                                    value={squareMeter}
 
+                                    />
+                                    <datalist id='squareMetersInput'>
+                                        <option value="4 x 4"></option>
+                                        <option value="3 x 4"></option>
+                                        <option value="5 x 4"></option>
+                                        <option value="5 x 3"></option>
+                                    </datalist>
+                                    <div className="form__label">
+                                        <label htmlFor="location" className='form__labelss'>Square meters <span
+                                        style={{opacity: '0.5'}}>(optional)</span></label>
+                                    </div>
 
                         </div>
-
-                    </form>
-                </Grid>
-                <Grid item xs={12} md={6} >
-                    <form>
-                        {/*<div className={classes.inputsContainer}>
-                        <Typography variant='body2'>Upload house image</Typography>
-
-                        <Grid style={{marginTop: '5px'}}>
-                            <Grid itme xs={12} md={6} className={classes.dropZone}>
-                                <DropzoneArea
-                                    acceptedFiles={['image/*']}
-                                    maxFileSize={2000000}
-                                    filesLimit={'6'}
-                                    dropzoneText={"Drag and drop an image here or click"}
-                                    onChange={onDropZoneChange}
-                                    initialFiles={[`http://localhost:5000/images/products/${theDocs ? theDocs.docs.ownerEmail : ''}/${theDocs ? theDocs.docs._id : ''}/${theDocs ? theDocs.files[0] : ''}`]
-                                    }
-
-                                />
-                                {console.log(theDocs.files, `and then`)}
-                                {console.log(`http://localhost:5000/images/products/${theDocs ? theDocs.docs.ownerEmail : ''}/${theDocs ? theDocs.docs._id : ''}/${theDocs ? theDocs.files[0] : ''}`, `why then`)}
-                            </Grid>
-                        </Grid>
-                    </div>*/}
                         <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>Square meters <span
-                                style={{opacity: '0.5'}}>(optional)</span></Typography>
-                            <input type="text" list='squareMetersInput' placeholder='Square meters of your house'
-                                   className={classes.input}
-                                   onChange={onSquareMeterChanged}
-                                   value={squareMeter}
-
-                            />
-                            <datalist id='squareMetersInput'>
-                                <option value="4 x 4"></option>
-                                <option value="3 x 4"></option>
-                                <option value="5 x 4"></option>
-                                <option value="5 x 3"></option>
-                            </datalist>
-
-                            <Typography variant='body2' id='networkError' className={classes.inputError}>You have to
-                                enter square meters.</Typography>
-
-                        </div>
-                        <div className={[classes.inputsContainer]}>
-                            <Typography variant='body2'>Available for rent starting from</Typography>
-                            {/* <input type="text" placeholder='Enter product name' className={classes.input}
-                                   onChange={onAvailabilityChanged}/>*/}
-                            <div className={classes.dataPicker}>
-                                <DatePicker
-                                    dateFormat="dd-MM-yyyy"
-                                    selected={availabilityDate}
-                                    className={[classes.input]}
-                                    onChange={onAvailabilityChanged}
-                                    value={moment(availabilityDate).format("DD-MM-YYYY")}
-
-                                />
+                                        {/*                                         
+                                        selected={this.state.starterdate}
+                                        value={moment(this.state.availabilityDate).format("DD-MM-YYYY")} */}
+                                {/* <TextField
+                                        label="Monthly payment"
+                                   
+                                        className={classes.input}
+                                        type="date"
+                                        
+                                        
+                                        value={moment(this.state.availabilityDate).format("YYYY-MM-DD")}
+                                        onChange={this.onAvailabilityChanged}
+                                        InputProps={{
+                                            
+                                            className: classes.input
+                                        }}
+                                    /> */}
+                                    <div className={classes.dataPicker} id="date">
+                                        <DatePicker
+                                            
+                                            name="date"
+                                            dateFormat="dd-MM-yyyy"
+                                            dayPlaceholder='21'
+                                            
+                                            className={[classes.input]}
+                                            onChange={onAvailabilityChanged}
+                                            value={moment(availabilityDate).format("DD-MM-YYYY")}
+                                        />
+                                        <div className="form__label">
+                                        <label htmlFor="location" className='form__labelss'>Available date start from</label>
+                                </div>
+                                    </div>
+                                <Typography variant='body2' id='availabilityError' className={classes.inputError}>You
+                                    have
+                                    to
+                                    Set Launch Data.</Typography>
                             </div>
-                            <Typography variant='body2' id='availabilityError' className={classes.inputError}>You
-                                have to
-                                Set Launch Data.</Typography>
-
-                        </div>
                         <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>phone number</Typography>
-                            <div style={{position: 'relative'}}>
-                                <input type="number" placeholder='Enter your phone number' className={classes.input}
-                                       onChange={onPhoneNumberChanged}
-                                       value={phoneNumber}
-                                       style={{paddingLeft: '50px'}}
-
-
+                                <TextField
+                                    label="Phone number"
+                                    name="phone" className={classes.input}
+                                    onChange={onPhoneNumberChanged}
+                                    value={phoneNumber}
+                                    placeholder='eg, 925762589'
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start">+251</InputAdornment>,
+                                        className: classes.input
+                                    }}
                                 />
-                                <span
-                                    style={{position: 'absolute', left: 7, top: "35%", opacity: '0.5'}}>+251</span>
-                            </div>
 
                             <Typography variant='body2' id='phoneNumberError' className={classes.inputError}>You
                                 have
                                 to enter your phone number.</Typography>
 
+                        </div>
 
+                    </form>
+                </Grid>
+                <Grid item xs={12} md={6}>
+
+                        <div className={classes.inputsContainer}>
+                            <Typography variant='body2' className={classes.leadertitle} >Upload house image<span
+                                style={{opacity: '0.5', fontSize:'12px'}}>(maximum 6 images)</span>
+                            </Typography>
+
+                            <Grid style={{marginTop: '5px'}}>
+                                <Grid itme xs={12} md={8} className={classes.dropZone} id="upload" data-cy="content">
+
+                                    {/*Icon ={}*/}
+                                    <DropzoneArea
+                                        acceptedFiles={['image/*']}
+                                        maxFileSize={6000000}
+                                        filesLimit={'6'}
+                                        dropzoneText={"Drag and drop an image here or click"}
+                                        onChange={onDropZoneChange}
+                                    />
+                                    {/*<DropzoneArea getPreviewIcon={this.handlePreviewIcon}
+                                                  dropzoneText="Drag and drop a jpg, png or webp Icon, Or click to add"/>*/}
+                                </Grid>
+                                <Typography variant='body2' id='dropZoneImage' className={classes.inputError}>You have
+                                    to
+                                    upload an image.</Typography>
+                            </Grid>
                         </div>
                         <div className={classes.inputsContainer}>
-                            <Typography variant='body2'>is it Guest House</Typography>
-                            <label htmlFor="guestYes">Yes</label>
-                            <input type="radio" value='yes' id='guestYes' checked={guestHouse === 'yes'}
-                                   name='guestRadio' placeholder='is it Guest House'
+                            <Typography variant='body2' className={classes.leadertitle}>is it Guest House</Typography>
+                            <label htmlFor="guestYes" className={classes.options} style={{ background:'#3293A8',}}>Yes</label>
+                            <input type="radio" value='yes' id='guestYes' name='guestRadio'
+                                   placeholder='is it Guest House'
                                    onChange={onGuestHouseChanged}
 
                             />
-                            <label htmlFor="guestNo">No</label>
+                            <label htmlFor="guestNo" className={classes.options} style={{ background:'#E21E2A',marginLeft:'10px'}}>No</label>
 
                             <input type="radio" value='no' id='guestNo' name='guestRadio'
                                    onChange={onGuestHouseChanged}
-                                   checked={guestHouse === 'no'}
-
                             />
                             <Typography variant='body2' id='guestHouseError' className={classes.inputError}>You have
                                 specific if it is guesthouse.</Typography>
@@ -746,20 +913,35 @@ function EditHouse(props) {
 
                         </div>
 
+                        <div className={classes.inputsContainer}>
+                            <TextField
+                                id="outlined-multiline-static"
+                                name="short Description" className={classes.textarea}
+                                label="Short Description"
+                                placeholder="short Description about the house"
+                                multiline
+                                rows={4}
+                                variant="outlined"
+                                value={description}
+                                style={{marginTop: '5px',}} 
+                                onChange={onDescriptionChanged}
+                            />
 
-                    <br/><br/><br/><br/>
-                    <div align='right'>
-                        {choseButton()}
-                    </div>
-                    </form>
-
-                </Grid>
+                        </div>
+                        <br/>
+                        <div  className={classes.buttons}>
+                             {choseButton()}
+                        </div>
+                        <br/>
+                        
+                    </Grid>
+                
 
             </Grid>
-        </Container></Container>
 
-    )
-
+        </Container>
+        </Container>
+    );
 }
 
 export default withStyles(useStyles)(EditHouse);
