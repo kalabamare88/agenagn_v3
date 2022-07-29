@@ -1,12 +1,13 @@
 import React from 'react';
 import {Button, Grid, Typography} from '@material-ui/core';
 import {DropzoneArea} from 'material-ui-dropzone';
-import Redirect from "react-router-dom";
+import {Navigate, Redirect} from "react-router-dom";
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import mainpic from '../images/main.png';
 import smallhouse from '../images/upright.png';
+import './inputlocation.css'
 
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -17,6 +18,8 @@ import moment from "moment";
 import {withStyles} from "@material-ui/styles";
 import Container from "@material-ui/core/Container";
 import { Link } from 'react-router-dom';
+import DatePicker from "react-datepicker";
+
 
 const useStyles = theme => ({
     root: {
@@ -37,7 +40,7 @@ const useStyles = theme => ({
            
             fontWeight:600,
             fontSize:14,
-            marginTop:-7,
+            marginTop:-5,
            
            
             color:'#3378BE'
@@ -67,14 +70,14 @@ const useStyles = theme => ({
         marginTop: '5px',
         width: '100%',
         height: '40px',
-       
-
     },
+    
     dataPicker: {
         "& .react-datepicker-wrapper": {
             display: 'block',
         },
-        "& input": {},
+        
+        "& hover": {color:'red'}
 
 
     },
@@ -170,8 +173,8 @@ const useStyles = theme => ({
     },
     buttonone:{
         
-        paddingLeft: '30px', paddingRight: '30px', background: '#3293A8',paddingTop:'10px', paddingBottom:'10px',
-        borderRadius: '5px', marginLeft: '15px', color: '#fff', textTransform: 'none',
+        paddingLeft: '40px', paddingRight: '40px', background: '#3293A8',paddingTop:'10px', paddingBottom:'10px',
+        borderRadius: '5px', marginLeft: '15px', color: '#fff', textTransform: 'none',marginBottom:'15px',
 
         "@media (max-width:980px)":{
             
@@ -229,7 +232,7 @@ const useStyles = theme => ({
         fontWeight:'normal'
     },
 });
-class New extends React.Component {
+class NewListing extends React.Component {
     state = {
         location: '',
         bedRoom: '',
@@ -239,7 +242,7 @@ class New extends React.Component {
         guestHouse: false,
         description: '',
         squareMeter: '',
-        availabilityDate:'',
+        availabilityDate:new Date(),
         errorMessage: '',
         isRedirectToHomepage: false,
         validity:false,
@@ -273,9 +276,10 @@ class New extends React.Component {
             phoneNumber: parseInt(this.state.phoneNumber),
             guestHouse: this.state.guestHouse,
             description: this.state.description,
-            availabilityDate:this.state.availabilityDate,
+            availabilityDate: moment(this.state.availabilityDate).format("DD-MM-YYYY"),
             listingStatus: this.listingStatusFilter(e),
             reviewStatus: e.currentTarget.value
+
         };
         console.log('come 1 ');
         if (!this.state.location) {
@@ -315,7 +319,7 @@ class New extends React.Component {
         if (this.state.location &&
             this.state.floor && this.state.monthlyPayment
             && this.state.bedRoom
-            && this.state.phoneNumber && this.state.availabilityDate ) {
+            && this.state.phoneNumber) {
             this.setState({validity: true,})
             console.log('come 3 ');
             // pass the product as props
@@ -353,7 +357,7 @@ class New extends React.Component {
         this.setState({isRedirectToHomepage: true,})
 
     };
-
+    
 
     onLocationChanged = (e) => {
         if (e.target.value.length === 0) {
@@ -414,10 +418,10 @@ class New extends React.Component {
 
 
     };
-    onAvailabilityChanged = (e) => {
-        console.log(e.target.value, 'e')
-        if (e.target.value === null) {
-            console.log('here it comes')
+    onAvailabilityChanged = (date) => {
+        console.log(date, 'this is date')
+        if (date === null) {
+           
             document.getElementById('availabilityError').style.display = 'block';
 
         } else {
@@ -425,7 +429,7 @@ class New extends React.Component {
 
         }
 
-        this.setState({availabilityDate: e.target.value})
+        this.setState({availabilityDate: date})
     };
 
     onSquareMeterChanged = (e) => {
@@ -533,14 +537,6 @@ class New extends React.Component {
                             </div>
     
                             <div className={classes.inputsContainer}>
-                                {/* <Typography variant='body2' className={classes.leadertitle}>Short description <span
-                                    style={{opacity: '0.5'}}>(optional)</span></Typography> */}
-                                {/* <textarea name="shortDescription" className={classes.textarea}
-                                          placeholder='Enter short description about the House...'
-                                          style={{marginTop: '5px',}} onChange={this.onDescriptionChanged}
-                                          value={this.state.description}
-                                /> */}
-    
                                 <TextField
                                     id="outlined-multiline-static"
                                     name="short Description" className={classes.textarea}
@@ -596,39 +592,31 @@ class New extends React.Component {
                             </div>
                             <img src={mainpic}  className={classes.addhouseimage} alt="" />
                             <div  className={classes.inputsContainer}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="demo-simple-select-label"  >Enter Location</InputLabel>
-                                        <Select
-                                        
-                                            labelId="demo-simple-select-label"
-                                            sx={{height:40}}
-                                            label="Enter Location"
-                                            list='locationOfCondominium'
-                                            id="location"
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start"><span><i class='fas fa-map-marker-alt'></i></span></InputAdornment>,
-                                                className: classes.input
-                                            }}
-                                            
-                                            name='Myname'
-                                            placeholder='Location of the condominium'
-                                            onChange={this.onLocationChanged}
-                                            value={this.state.location}
-                                           
-                                        >   
-                                            <TextField id="standard-basic"  variant="standard" />
-                                            <MenuItem value="Ayat Condominium">Ayat Condominium</MenuItem>
-                                            <MenuItem value="Yeka Abado Condominium">Yeka Abado Condominium</MenuItem>
-                                            <MenuItem value="Sumit Condominium">Sumit Condominium</MenuItem>
-                                            <MenuItem value="Gelan Condominium">Gelan Condominium</MenuItem>
-                                            <MenuItem value="Tuludimtu Condominium">Tuludimtu Condominium</MenuItem>
-                                            <MenuItem value="4 killo Condominium">4 killo Condominium</MenuItem>
-                                            <MenuItem value="Gotera Condominium">Gotera Condominium</MenuItem>
-                                            <MenuItem value="Balderas Condominium">Balderas Condominium</MenuItem>
-                                            <MenuItem value="Mebrathail Condominium">Mebrathail Condominium</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    
 
+
+                                <input type="text" list='locationOfCondominium' id="location" name='Myname'
+                                       
+                                       className='form__input'
+                                       placeholder='Location of condominium'
+                                       onChange={this.onLocationChanged}
+                                       value={this.state.location}
+                                />
+                                <div className="form__label">
+                                    <label htmlFor="location" className='form__labels'>Location</label>
+                                </div>
+                                
+                                <datalist id="locationOfCondominium">
+                                    <option value="Ayat Condominium"/>
+                                    <option value="Yeka Abado Condominium"/>
+                                    <option value="Submit Condominium"/>
+                                    <option value="Gelan Condominium"/>
+                                    <option value="Tuludimtu Condominium"/>
+                                    <option value="4 killo Condominium"/>
+                                    <option value="Gotera Condominium"/>
+                                    <option value="Balderas Condominium"/>
+                                    <option value="Mebrathail Condominium"/>
+                                </datalist>
                                 <Typography variant='body2' id='locationError' className={classes.inputError}>You have
                                     to entered Location of your condominium.</Typography>
 
@@ -638,7 +626,7 @@ class New extends React.Component {
                                         <InputLabel id="demo-simple-select-label"  >Bedroom</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-label"
-                                            sx={{height:40}}
+                                            sx={{height:42}}
                                             label="Bedroom"
                                             onChange={this.onBedroomChanged}
                                             name="selectNumberOfBedrooms"
@@ -659,7 +647,7 @@ class New extends React.Component {
                                         <InputLabel id="demo-simple-select-label"  >Select Floor</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-label"
-                                            sx={{height:40}}
+                                            sx={{height:42}}
                                             label="Select Floor"
                                             onChange={this.onFloorchanged}
                                             name="selectNumberOfBedrooms"
@@ -671,6 +659,9 @@ class New extends React.Component {
                                             <MenuItem value="4">+4</MenuItem>
                                             <MenuItem value="5">+5</MenuItem>
                                             <MenuItem value="6">+6</MenuItem>
+                                            <MenuItem value="7">+7</MenuItem>
+                                            <MenuItem value="8">+8</MenuItem>
+                                            <MenuItem value="9">+9</MenuItem>
                                         </Select>
                                 </FormControl>
                                 <Typography variant='body2' id='floorError' className={classes.inputError}>you have
@@ -689,7 +680,7 @@ class New extends React.Component {
                                     
                                     
                                     InputProps={{
-                                        startAdornment: <InputAdornment position="start"><span><i class='fas fa-map-marker-alt'></i></span></InputAdornment>,
+                                        startAdornment: <InputAdornment position="start"><span><i class='fas fa-dollar-sign'></i></span></InputAdornment>,
                                         className: classes.input
                                     }}
                                 />
@@ -699,44 +690,39 @@ class New extends React.Component {
 
                             </div>
                             <div className={classes.inputsContainer}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label"  >Square meters <span
-                                        style={{opacity: '0.5'}}>(optional)</span>
-                                    </InputLabel>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        sx={{height:40}}
-                                        label="Square meters (optional ..)"
-                                        placeholder='Square meter of your house' 
-                                        onChange={this.onSquareMeterChanged}
-                                        value={this.state.squareMeter}
-                                    >
-                                        <MenuItem value="4 x 4">4 x 4</MenuItem>
-                                        <MenuItem value='3 x 4'>3 x 4</MenuItem>
-                                        <MenuItem value="5 x 4">5 x 4</MenuItem>
-                                        <MenuItem value="5 x 3">5 x 3</MenuItem>
-                                    </Select>
-                                </FormControl>
+                                    <input name="SquareMeter" type="text" list='squareMetersInput'
+                                    placeholder='Square meter of your house' className='form__input'
+                                    onChange={this.onSquareMeterChanged}
+                                    value={this.state.squareMeter}
+
+                                    />
+                                    <datalist id='squareMetersInput'>
+                                        <option value="4 x 4"></option>
+                                        <option value="3 x 4"></option>
+                                        <option value="5 x 4"></option>
+                                        <option value="5 x 3"></option>
+                                    </datalist>
+                                    <div className="form__label">
+                                        <label htmlFor="location" className='form__labelss'>Square meters <span
+                                        style={{opacity: '0.5'}}>(optional)</span></label>
+                                    </div>
 
                             </div>
                             <div className={classes.inputsContainer}>
-                                        {/*                                         
-                                        selected={this.state.productLaunchDate}
-                                        value={moment(this.state.availabilityDate).format("DD-MM-YYYY")} */}
-                                <TextField
-                                        label="Monthly payment"
-                                   
-                                        className={classes.input}
-                                        type="date"
-                                        
-                                        
-                                        value={moment(this.state.availabilityDate).format("YYYY-MM-DD")}
-                                        onChange={this.onAvailabilityChanged}
-                                        InputProps={{
-                                            
-                                            className: classes.input
-                                        }}
-                                    />
+                                    <div className={classes.dataPicker} id="date">
+                                        <DatePicker
+                                           
+                                            name="date"
+                                            dateFormat="dd-MM-yyyy"
+                                            selected={this.state.productLaunchDate}
+                                            className='form__input'
+                                            onChange={this.onAvailabilityChanged}
+                                            value={moment(this.state.availabilityDate).format("DD-MM-YYYY")}
+                                        />
+                                        <div className="form__label">
+                                        <label htmlFor="location" className='form__labelss'>Available date start from</label>
+                                </div>
+                                    </div>
                                 <Typography variant='body2' id='availabilityError' className={classes.inputError}>You
                                     have
                                     to
@@ -764,7 +750,7 @@ class New extends React.Component {
 
                             <div  className={classes.buttons}>
                                 <br/><br/>
-                                <Button id="submit" onClick={this.onFormSubmit} value='Pending' variant='contained'className={classes.buttonone} href='/addhousetwo'> Next</Button>
+                                <Button id="submit" onClick={this.onFormSubmit} value='Pending' variant='contained'className={classes.buttonone} > Next</Button>
                                 <br/><br/>
                             </div>
 
@@ -781,6 +767,6 @@ class New extends React.Component {
 
 }
 
-export default withStyles(useStyles)(New);
+export default withStyles(useStyles)(NewListing);
 
 
