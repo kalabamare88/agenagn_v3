@@ -179,7 +179,7 @@ const useStyles = theme => ({
 
         }, 
         "&:hover": {
-            color: 'red'
+            color: 'black'
         },
         
     },
@@ -418,35 +418,20 @@ function EditHouse(props) {
                 if (reviewStatus === "Pending" || reviewStatus === "Rejected") {
                     return <React.Fragment>
 
-                        <Button onClick={onFormSubmit} value='Approved' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}>Cancel Review</Button>
-                        <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        <Button onClick={onFormSubmit} value='Approved' variant='contained'className={classes.buttonone}>Cancel Review</Button>
+                        <Button onClick={onFormSubmit} value='Pending' variant='contained'className={classes.buttonone}> Update Detail</Button>
 
                     </React.Fragment>;
                 } else if (reviewStatus === "Approved") {
                     return <React.Fragment>
 
-                        <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                            paddingLeft: '0px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        <Button onClick={onFormSubmit} value='Pending' variant='contained' className={classes.buttonone}> Update Detail</Button>
 
                     </React.Fragment>
                 } else {
                     return <React.Fragment>
-                        <Button onClick={onFormSubmit} value='' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}>Cancel Review</Button>
-                        <Button onClick={onFormSubmit} value='' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        <Button onClick={onFormSubmit} value='' variant='contained'className={classes.buttonone}>Cancel Review</Button>
+                        <Button onClick={onFormSubmit} value='' variant='contained'className={classes.buttonone}> Update Detail</Button>
 
                     </React.Fragment>
                 }
@@ -455,78 +440,45 @@ function EditHouse(props) {
                 if (reviewStatus === "Pending" || reviewStatus === "Rejected") {
                     return <React.Fragment>
 
-                        <Button onClick={onFormSubmit} value='Approved' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}>Cancel Review</Button>
-                        <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        <Button onClick={onFormSubmit} value='Approved' variant='contained'className={classes.buttonone}>Cancel Review</Button>
+                        <Button onClick={onFormSubmit} value='Pending' variant='contained'className={classes.buttonone}> Update Detail</Button>
 
                     </React.Fragment>;
                 } else if (reviewStatus === "Approved") {
                     return <React.Fragment>
 
-                        <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        <Button onClick={onFormSubmit} value='Pending' variant='contained'className={classes.buttonone}> Update Detail</Button>
 
                     </React.Fragment>
                 } else {
                     return <React.Fragment>
-                        <Button onClick={onFormSubmit} value='' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}>Cancel Review</Button>
-                        <Button onClick={onFormSubmit} value='' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Update Detail</Button>
+                        <Button onClick={onFormSubmit} value='' variant='contained'className={classes.buttonone}>Cancel Review</Button>
+                        <Button onClick={onFormSubmit} value='' variant='contained'className={classes.buttonone}> Update Detail</Button>
 
                     </React.Fragment>
                 }
             case 'Draft' :
                 return <React.Fragment>
-                    <Button onClick={onFormSubmit} value='NA' variant='contained' style={{
-                        paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                        borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                    }}>Save As Draft</Button>
-                    <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                        paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                        borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                    }}>Submit For Review</Button>
+                    <Button onClick={onFormSubmit} value='NA' variant='contained'className={classes.buttonone} style={{paddingInlineEnd:'35px'}}>Save As Draft</Button>
+                    <Button onClick={onFormSubmit} value='Pending' variant='contained'className={classes.buttonone}>Submit For Review</Button>
 
                 </React.Fragment>;
             case 'Submitted' :
                 if (reviewStatus === "Pending" || reviewStatus === "Rejected") {
                     return <React.Fragment>
-                        <Button onClick={onFormSubmit} value='NA' className={classes.buttonone} variant='contained' style={{
-                            
-                        }}>Cancel Review</Button>
-                        <Button onClick={onFormSubmit} value='Pending' className={classes.buttonone} variant='contained' style={{
-                        }}> Update</Button>
+                        <Button onClick={onFormSubmit} value='NA' className={classes.buttonone} variant='contained'>Cancel Review</Button>
+                        <Button onClick={onFormSubmit} value='Pending' className={classes.buttonone} variant='contained'> Update</Button>
 
                     </React.Fragment>;
                 } else if (reviewStatus === "Approved") {
                     return <React.Fragment>
-                        <Button onClick={onFormSubmit} value='Pending' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> update review</Button>
+                        <Button onClick={onFormSubmit} value='Pending' variant='contained'className={classes.buttonone}> update review</Button>
 
                     </React.Fragment>
                 } else {
                     return <React.Fragment>
-                        <Button onClick={onFormSubmit} value='Draft' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}>Cancel Review</Button>
-                        <Button onClick={onFormSubmit} value='Submitted' variant='contained' style={{
-                            paddingLeft: '50px', paddingRight: '50px', background: '#005CC8',
-                            borderRadius: '5px', marginRight: '15px', color: '#fff', textTransform: 'none'
-                        }}> Next</Button>
+                        <Button onClick={onFormSubmit} value='Draft' variant='contained'className={classes.buttonone}>Cancel Review</Button>
+                        <Button onClick={onFormSubmit} value='Submitted' variant='contained'className={classes.buttonone}> Next</Button>
 
                     </React.Fragment>
                 }
