@@ -12,7 +12,7 @@ export const addHouse = createAsyncThunk(
         formData,
         {
           headers: {
-            // "content-type": "multipart/form-data",
+            "content-type": "multipart/form-data",
             "x-access-token": JSON.parse(localStorage.getItem("token")),
           },
         }
@@ -72,11 +72,13 @@ export const editHouse = createAsyncThunk(
     try {
       const response = await axios.get(`${local}/edithouse`, {
         headers: {
+          "content-type": "multipart/form-data",
           "x-access-token": JSON.parse(localStorage.getItem("token")),
         },
-        params: id,
+        params: {
+          id: id,
+        },
       });
-
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -90,6 +92,7 @@ export const editHouseUpdate = createAsyncThunk(
     try {
       const response = await axios.post(`${local}/editHouseUpdate`, formData, {
         headers: {
+          "content-type": "multipart/form-data",
           "x-access-token": JSON.parse(localStorage.getItem("token")),
         },
       });

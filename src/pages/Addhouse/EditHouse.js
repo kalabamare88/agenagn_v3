@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Grid, Typography, withStyles } from "@material-ui/core";
-import { Redirect } from "react-router-dom";
+import { Redirect, useParams } from "react-router-dom";
 
 import { DropzoneArea } from "material-ui-dropzone";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -18,7 +18,7 @@ import backEndApi from "../../services/api";
 import moment from "moment";
 import Container from "@material-ui/core/Container";
 import axios from "axios";
-import { editHouseUpdate } from "../../features/house/houseSlice";
+import { editHouseUpdate, editHouse } from "../../features/house/houseSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const useStyles = (theme) => ({
@@ -182,21 +182,6 @@ const useStyles = (theme) => ({
         width: "17rem",
       },
     },
-
-    /*"& .MuiTypography-h5": {
-            fontSize: '14px',
-            fontWeight: 'normal'
-        },
-        "& .MuiDropzoneArea-text": {
-            marginTop: '130px',
-            color: '#9e9e9e'
-        },
-        "& .MuiSvgIcon-root": {
-            display: 'flex',
-            marginTop: '-100px',
-            marginLeft: '110px',
-            color: "#9e9e9e"
-        }*/
   },
   imageleader: {
     width: "80%",
@@ -213,6 +198,15 @@ let otherArray = [];
 function EditHouse(props) {
   const { classes } = props;
   const dispatch = useDispatch();
+  const { id } = useParams();
+
+  const {
+    houseData,
+    houseDetailIsLoading,
+    houseDetailIsSuccess,
+    houseUpdateLoading,
+    houseUpdateSuccess,
+  } = useSelector((state) => state.house);
   props.setSideBar(false);
   const [theDocs, setTheDocs] = useState("");
   const [originalHouseId, setOriginalHouseId] = useState("");
@@ -233,22 +227,22 @@ function EditHouse(props) {
   const [isRedirectToHomepage, setIsRedirectToHomepage] = useState("");
 
   useEffect(() => {
-    const loadData = async () => {
-      const { data } = await axios.get("http://localhost:5000/edithouse", {
-        headers: {
-          "content-type": "multipart/form-data",
-          "x-access-token": JSON.parse(localStorage.getItem("token")),
-        },
-        params: { id: props.match.params.id },
-      });
-      console.log(data);
-      setTheDocs(data);
+    dispatch(editHouse(id));
+  }, []);
+
+  useEffect(() => {
+    dispatch(editHouse(id));
+  }, [props.match.params.id, setEditedEncodedAvatarUrl, setTheDocs]);
+
+  useEffect(() => {
+    if (houseDetailIsSuccess) {
+      setTheDocs(houseData);
       const imagesImage = () => {
-        const files = data.files;
+        const files = houseData.files;
         otherArray = [];
         if (files?.constructor === Array) {
           files.forEach((the) => {
-            const what = `http://localhost:5000/images/products/${data.docs.ownerEmail}/${data.docs._id}/${the}`;
+            const what = `http://localhost:5000/images/products/${houseData.docs.ownerEmail}/${houseData.docs._id}/${the}`;
             otherArray.push(what);
           });
         }
@@ -257,25 +251,24 @@ function EditHouse(props) {
       };
 
       console.log(imagesImage(), "and and and what");
-      setOwnerEmail(data.docs.ownerEmail);
-      setOriginalHouseId(data.docs._id);
-      setLocation(data.docs.location);
-      setSquareMeter(data.docs.squareMeter);
-      setBedRoom(parseInt(data.docs.bed_room));
-      setMonthlyPayment(parseInt(data.docs.monthly_payment));
-      setFloor(parseInt(data.docs.floor));
-      setPhoneNumber(parseInt(data.docs.phone_number));
-      setGuestHouse(data.docs.guest_house ? "yes" : "no");
-      setDescription(data.docs.description);
-      setAvailabilityDate(data.docs.availabilityDate);
-      setListingStatus(data.docs.listingStatus);
-      setFile(data.docs.File);
-      setReviewStatus(data.docs.reviewStatus);
-      setEditedEncodedAvatarUrl(data.docs.encodedAvatarUrl);
-      console.log(data, "data will be data");
-    };
-    loadData();
-  }, [props.match.params.id, setEditedEncodedAvatarUrl, setTheDocs]);
+      setOwnerEmail(houseData.docs.ownerEmail);
+      setOriginalHouseId(houseData.docs._id);
+      setLocation(houseData.docs.location);
+      setSquareMeter(houseData.docs.squareMeter);
+      setBedRoom(parseInt(houseData.docs.bed_room));
+      setMonthlyPayment(parseInt(houseData.docs.monthly_payment));
+      setFloor(parseInt(houseData.docs.floor));
+      setPhoneNumber(parseInt(houseData.docs.phone_number));
+      setGuestHouse(houseData.docs.guest_house ? "yes" : "no");
+      setDescription(houseData.docs.description);
+      setAvailabilityDate(houseData.docs.availabilityDate);
+      setListingStatus(houseData.docs.listingStatus);
+      setFile(houseData.files);
+      setReviewStatus(houseData.docs.reviewStatus);
+      setEditedEncodedAvatarUrl(houseData.docs.encodedAvatarUrl);
+      console.log(houseData, "data will be data");
+    }
+  }, [houseDetailIsSuccess]);
 
   const onFormSubmit = (e) => {
     e.preventDefault();
