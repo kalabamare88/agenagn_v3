@@ -7,6 +7,7 @@ import {
   Popover,
   Divider,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,7 +22,7 @@ import useStyles from "./UserStyle";
 import ListingStatusFilter from "./ListingStatusFilter";
 import usePagination from "../Pagination";
 
-function UserDashboard() {
+function UserDashboard(props) {
   const [state, setState] = useState({
     homeDocs: [],
     userDetail: "",
@@ -32,6 +33,7 @@ function UserDashboard() {
     perPage: 2,
     totalNumber: 0,
   });
+
   const [page, setPage] = useState(1);
   const PER_PAGE = 5;
 
@@ -59,31 +61,26 @@ function UserDashboard() {
   const classes = useStyles();
 
   useEffect(() => {
-    const config = {
-      headers: {
-        "x-access-token": JSON.parse(localStorage.getItem("token")).token,
-      },
-    };
-    const fetchData = async () => {
-      const response = await backEndApi.get("/dashboard", config);
-      setState({
-        homeDocs: response.data.homeDocs,
-        userDetail: response.data.docs,
-        totalNumber: response.data.count,
-      });
-    };
-    fetchData();
+    setState({
+      homeDocs: props.data.homeDocs,
+      userDetail: props.data.docs,
+      totalNumber: props.data.count,
+    });
   }, []);
+
+  useEffect(() => {
+    setState({
+      homeDocs: props.data.homeDocs,
+      totalNumber: props.data.count,
+      userDetail: props.data.docs,
+    });
+  }, [props.data]);
 
   if (!state.homeDocs) {
     /*window.location.reload()*/
   }
 
   const onSwitchChange = async (e) => {
-    console.log(e.target.name);
-    console.log(e.target.checked);
-    console.log(e.target.id);
-
     const response = await backEndApi.post("/activateButton", {
       params: {
         isActive: e.target.checked,
@@ -204,36 +201,43 @@ function UserDashboard() {
                     Action
                   </div>
                   <Divider />
-                  <Button
-                    id="addNewHouse"
-                    href={"/editHouse/" + row._id}
-                    variant="outlined"
-                    className={classes.popover}
+
+                  <Link
                     style={{
+                      textDecoration: "none",
                       border: "none",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      padding: ".5rem 0",
                       color: "#9FA2B4",
                       fontSize: "14px",
                     }}
-                    startIcon={
-                      <EditIcon
-                        style={{ color: "#58D1BB", fontSize: "1rem" }}
-                      />
-                    }
+                    to={`editHouse/${row._id}`}
                   >
-                    Edit
-                  </Button>
+                    <Button
+                      style={{
+                        border: "none",
+                        width: "100%",
+                      }}
+                      id="addNewHouse"
+                      // href={"/dashboard"}
+                      variant="outlined"
+                      className={classes.popover}
+                      startIcon={
+                        <EditIcon
+                          style={{ color: "#58D1BB", fontSize: "1rem" }}
+                        />
+                      }
+                    >
+                      Edit
+                    </Button>
+                  </Link>
+
                   <Divider />
-                  <Button
-                    id="addNewHouse"
-                    href={"/dashboard"}
-                    variant="outlined"
-                    className={classes.popover}
+                  <Link
                     style={{
+                      textDecoration: "none",
                       border: "none",
                       display: "flex",
                       flexDirection: "column",
@@ -242,14 +246,26 @@ function UserDashboard() {
                       color: "#9FA2B4",
                       fontSize: "14px",
                     }}
-                    startIcon={
-                      <DeleteIcon
-                        style={{ color: "#F24545", fontSize: "1rem" }}
-                      />
-                    }
+                    // to={`editHouse/${row._id}`}
                   >
-                    Delete
-                  </Button>
+                    <Button
+                      id="addNewHouse"
+                      // href={"/dashboard"}
+                      variant="outlined"
+                      className={classes.popover}
+                      style={{
+                        border: "none",
+                        width: "100%",
+                      }}
+                      startIcon={
+                        <DeleteIcon
+                          style={{ color: "#F24545", fontSize: "1rem" }}
+                        />
+                      }
+                    >
+                      Delete
+                    </Button>
+                  </Link>
                 </div>
               </Popover>
             </IconButton>
@@ -301,20 +317,27 @@ function UserDashboard() {
             </Grid>
             <Grid item xs={3} sm={3} md={5}></Grid>
             <Grid item xs={5} md={4} sm={4} align="right">
-              <Button
-                id="addNewHouse"
-                href="/addhouse"
-                variant="outlined"
-                className={classes.heroBtn}
-                style={{}}
-                startIcon={
-                  <AddCircleOutlinedIcon
-                    style={{ color: "#58D1BB", fontSize: "2rem" }}
-                  />
-                }
-              >
-                Add new house
-              </Button>
+              <Link style={{ textDecoration: "none" }} to={`addhouse`}>
+                <Button
+                  id="addNewHouse"
+                  variant="outlined"
+                  className={classes.heroBtn}
+                  style={{
+                    backgroundColor: "#D5D7DF",
+                    borderRadius: "15px",
+                    border: "none",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                  }}
+                  startIcon={
+                    <AddCircleOutlinedIcon
+                      style={{ color: "#58D1BB", fontSize: "2rem" }}
+                    />
+                  }
+                >
+                  Add new house
+                </Button>
+              </Link>
             </Grid>
           </Grid>
           <Box sx={{ flexGrow: 1 }}>

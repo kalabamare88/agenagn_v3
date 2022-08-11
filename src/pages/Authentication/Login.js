@@ -1,17 +1,18 @@
-import React from "react";
-import { withStyles } from "@material-ui/core";
-import { Redirect } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core";
+import { useDispatch, useSelector } from "react-redux";
 
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Link from "@material-ui/core/Link";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
-
+import { loginUser } from "../../features/auth/authSlice";
+import { useHistory } from "react-router-dom";
 import backEndApi from "../../services/api";
 
 const loginImage = process.env.PUBLIC_URL + "/img/image.png";
-const useStyles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     width: "100%",
     paddingLeft: "16px",
@@ -108,18 +109,44 @@ const useStyles = (theme) => ({
       marginTop: 10,
     },
   },
-});
+}));
 
-class Login extends React.Component {
-  state = {
-    email: "",
-    password: "",
-    redirect: false,
-    errorMessage: "",
-    token: "",
-  };
-  errorcheck = () => {
-    if (this.state.errorMessage) {
+function Login() {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const { loginData, loginErrorMessage, isLoginSuccess } = useSelector(
+    (state) => state.auth
+  );
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [redirect, setRedirect] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [token, setToken] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const classes = useStyles();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      history.push("/dashboard");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (loginErrorMessage === "notUser") {
+      setErrorMessage("Incorrect Username or Password!");
+    }
+  }, [loginErrorMessage]);
+
+  useEffect(() => {
+    if (isLoginSuccess === true) {
+      history.push("/dashboard");
+    }
+  }, [isLoginSuccess]);
+
+  const errorCheck = () => {
+    if (errorMessage) {
       return (
         <Typography
           variant="h6"
@@ -129,7 +156,7 @@ class Login extends React.Component {
             fontSize: "14px",
           }}
         >
-          {this.state.errorMessage}
+          {errorMessage}
         </Typography>
       );
     } else {
@@ -141,168 +168,141 @@ class Login extends React.Component {
     }
   };
 
-  onEmailChange = (e) => {
-    this.setState({ email: e.target.value });
+  const onEmailChange = (e) => {
+    // setState({ email: e.target.value });
+    setEmail(e.target.value);
   };
-  onPasswordChange = (e) => {
-    this.setState({ password: e.target.value });
+  const onPasswordChange = (e) => {
+    // setState({ password: e.target.value });
+    setPassword(e.target.value);
   };
-  loginApiRequest = async (loginParams) => {
-    const { data } = await backEndApi.post("/loginUser", {
-      params: loginParams,
-    });
-    const token = { token: data.token };
-    if (data === "notUser") {
-      this.setState({ errorMessage: "Incorrect Username or Password!" });
-    } else {
-      this.props.setToken(token);
-      this.setState({ token: token, redirect: true, isAdmin: data.isAdmin });
-      localStorage.setItem("admin", JSON.stringify({ isAdmin: data.isAdmin }));
+  const loginApiRequest = (loginParams) => {
+    dispatch(loginUser(loginParams));
+    // const { data } = await backEndApi.post("/loginUser", {
+    //   params: loginParams,
+    // });
+
+    if (loginData !== "notUser") {
+      // setState({ errorMessage: "Incorrect Username or Password!" });
+      const token = { data: loginData };
+      // localStorage.setItem("token", JSON.stringify(token));
+      // props.setToken(token);
+      // setState({ token: token, redirect: true, isAdmin: data.isAdmin });
+      setToken(token);
+      setRedirect(true);
+      setIsAdmin(loginData?.isAdmin);
     }
   };
-  validateInput = () => {
-    const logindetails = {
-      email: this.state.email,
-      password: this.state.password,
+  const validateInput = () => {
+    const loginDetail = {
+      email: email,
+      password: password,
     };
 
-    if (this.state.email && this.state.password) {
-      this.loginApiRequest(logindetails);
-      /*/!*axios.post("http://localhost:5000/getUser", {params: logindetails })*!/
-            axios.post("https://damp-fjord-23317.herokuapp.com/getUser", {params: logindetails})
-                .then(res => {
-                    const token = res.data;
-                    if (res.data === "notUser") {
-                        this.setState({errorMessage: "Incorrect Username or Password!"});
-
-                    } else {
-
-                        this.props.setToken(token);
-                        this.setState({token:token,redirect: true});
-                    }
-                })*/
+    if (email && password) {
+      loginApiRequest(loginDetail);
     } else {
-      this.setState({ errorMessage: "Please fill all the inputs!" });
+      setErrorMessage("Please fill all the inputs!");
+      // setState({ errorMessage: "Please fill all the inputs!" });
     }
   };
-  onSubmit = (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
-    this.validateInput();
-    /* const getUsers = async () => {
-         /!*let res = await axios.post("https://reqres.in/api/users?page=1",{params:logindetails});*!/
-         let res = await axios.post("http://localhost:5000/getUser",{params:logindetails});
-         let { data } = res.data;
-         console.log(data);
-         console.log("this is printed");
-         /!*this.setState({ users: data });*!/
-     };
-         getUsers()*/
+    validateInput();
   };
 
-  componentDidMount() {
-    const token = this.props.getToken();
-    console.log(token);
-    if (token) {
-      console.log("welcome Mr ");
-      return <Redirect to="/addhouse" />;
-    }
-  }
+  // if (redirect || props.getToken()) {
+  //   return <Redirect to="/dashboard" />;
+  // }
 
-  render() {
-    if (this.state.redirect || this.props.getToken()) {
-      console.log("welcome Mr ");
-      return <Redirect to="/dashboard" />;
-    }
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <div className={classes.root}>
-          <div className={classes.loginImgHolder}>
-            <img
-              src={loginImage}
-              alt=""
-              width="93%"
-              height="420px"
-              className={classes.loginImg}
+  return (
+    <div className={classes.container}>
+      <div className={classes.root}>
+        <div className={classes.loginImgHolder}>
+          <img
+            src={loginImage}
+            alt=""
+            width="93%"
+            height="420px"
+            className={classes.loginImg}
+          />
+        </div>
+
+        <div className={classes.formHolder}>
+          <Typography
+            align="center"
+            component="h1"
+            variant="h5"
+            style={{ padding: 10 }}
+          >
+            Login
+          </Typography>
+          <form className={classes.form} noValidate>
+            <TextField
+              variant="outlined"
+              margin="none"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              onChange={onEmailChange}
+              autoComplete="email"
+              autoFocus
+              className={classes.textField}
             />
-          </div>
 
-          <div className={classes.formHolder}>
-            <Typography
-              align="center"
-              component="h1"
-              variant="h5"
-              style={{ padding: 10 }}
+            <TextField
+              variant="outlined"
+              margin="none"
+              required
+              fullWidth
+              name="password"
+              onChange={onPasswordChange}
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              className={classes.textField}
+            />
+            {/* <FormControlLabel
+                              control={<Checkbox value="remember" color="primary"
+                                                 onChange={this.onCheckboxChange}/>}
+                              label="I have read and agreed to Privacy Policy  & TOU"
+                          />*/}
+            <Box align="right">
+              <Link href="/resetPassword" variant="body2">
+                Forgot password?
+              </Link>
+            </Box>
+            {errorCheck()}
+
+            <Button
+              id="login"
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={onSubmit}
             >
-              Login
-            </Typography>
-            <form className={classes.form} noValidate>
-              <TextField
-                variant="outlined"
-                margin="none"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                onChange={this.onEmailChange}
-                autoComplete="email"
-                autoFocus
-                className={classes.textField}
-              />
-
-              <TextField
-                variant="outlined"
-                margin="none"
-                required
-                fullWidth
-                name="password"
-                onChange={this.onPasswordChange}
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                className={classes.textField}
-              />
-              {/* <FormControlLabel
-                                control={<Checkbox value="remember" color="primary"
-                                                   onChange={this.onCheckboxChange}/>}
-                                label="I have read and agreed to Privacy Policy  & TOU"
-                            />*/}
-              <Box align="right">
-                <Link href="/resetPassword" variant="body2">
-                  Forgot password?
-                </Link>
-              </Box>
-              {this.errorcheck()}
-
-              <Button
-                id="login"
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                onClick={this.onSubmit}
-              >
-                Log in
-              </Button>
-              <div container justify="center">
-                <div item md={6}>
-                  <Box mt={4} style={{ fontWeight: "800" }}>
-                    Don't have an account?
-                    <Link href="/signup" variant="body2" id="gotoSignup">
-                      {" Sign Up"}
-                    </Link>
-                  </Box>
-                </div>
+              Log in
+            </Button>
+            <div container justify="center">
+              <div item md={6}>
+                <Box mt={4} style={{ fontWeight: "800" }}>
+                  Don't have an account?
+                  <Link href="/signup" variant="body2" id="gotoSignup">
+                    {" Sign Up"}
+                  </Link>
+                </Box>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
-export default withStyles(useStyles)(Login);
+export default Login;

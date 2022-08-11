@@ -13,12 +13,14 @@ import moment from "moment";
 import backEndApi from "../../../services/api";
 import Pagination from "@material-ui/lab/Pagination";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import usePagination from "../Pagination";
 import useStyles from "./AdminStyle";
 import ReviewStatusFilter from "../ReviewStatusFilter";
+import AdminDrawer from "../../../components/AdminDrawer";
+import { useSelector } from "react-redux";
 
-function AdminDashboard() {
+function AdminDashboard(props) {
   const [state, setState] = useState({
     homeDocs: [],
     isReRender: false,
@@ -29,8 +31,15 @@ function AdminDashboard() {
     perPage: 2,
     totalNumber: 0,
   });
+
+  props.setSideBar(true);
+
+  const { isSuccess } = useSelector((state) => state.dashboard);
+
   const [page, setPage] = useState(1);
   const PER_PAGE = 5;
+
+  props.setSideBar(true);
 
   const count = Math.ceil(state.totalNumber / PER_PAGE);
   let _DATA = usePagination(state.homeDocs, state.totalNumber, PER_PAGE);
@@ -43,43 +52,32 @@ function AdminDashboard() {
   const classes = useStyles();
 
   useEffect(() => {
-    const config = {
-      headers: {
-        "x-access-token": JSON.parse(localStorage.getItem("token")).token,
-      },
-    };
-
-    const fetchData = async () => {
-      const response = await backEndApi.get("/dashboard", config);
-      setState({
-        homeDocs: response.data.homeDocs,
-        totalNumber: response.data.count,
-      });
-    };
-    fetchData();
+    setState({
+      homeDocs: props.data.homeDocs,
+      totalNumber: props.data.count,
+    });
   }, []);
 
-  const onRadioGroupChange = async (e) => {
-    console.log(e.target.value);
-    setState({ filterSelected: e.target.value, page: 1 });
-    const config = {
-      headers: {
-        "x-access-token": JSON.parse(localStorage.getItem("token")).token,
-      },
-      params: { filter: e.target.value },
-    };
-    const response = await backEndApi.get("/dashboard", config);
+  useEffect(() => {
     setState({
-      homeDocs: response.data.homeDocs,
-      totalNumber: response.data.count,
+      homeDocs: props.data.homeDocs,
+      totalNumber: props.data.count,
     });
+  }, [props.data]);
+
+  const onRadioGroupChange = (e) => {
+    props.onRadioGroupChange(e.target.value);
+
+    // setState({
+    //   homeDocs: props.data.homeDocs,
+    //   totalNumber: props.data.count,
+    // });
   };
 
   const reRender = (isReRender) => {
     setState({ isReRender: isReRender });
   };
   const onTableRowClick = (row) => {
-    console.log(row._id);
     setState({ isRedirect: true, redirectTo: row._id });
   };
 
@@ -92,7 +90,15 @@ function AdminDashboard() {
 
   return (
     <Grid className={classes.root} spacing={1}>
-      <Grid item xs={12} md={7} lg={8} xl={9}>
+      <Grid item xs={12} md={2} lg={1} xl={2}>
+        {/* <Grid item xs={12} md={2} lg={1} xl={2}>
+          <div style={{ display: "flex" }}>
+            {isSuccess ? props.data.auth == "Admin" ? <AdminDrawer /> : "" : ""}
+            <h3 style={{ fontSize: "30px", margin: 0, color: "black" }}></h3>
+          </div>
+        </Grid> */}
+      </Grid>
+      <Grid item xs={12} md={7} lg={7} xl={6}>
         <div style={{ width: "100%" }}>
           <div>
             <div
@@ -114,25 +120,26 @@ function AdminDashboard() {
                 </span>
               </div>
               <div>
-                <Button
-                  id="addNewHouse"
-                  href="/addhouse"
-                  variant="outlined"
-                  style={{
-                    backgroundColor: "#D5D7DF",
-                    borderRadius: "15px",
-                    border: "none",
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                  }}
-                  startIcon={
-                    <AddCircleOutlinedIcon
-                      style={{ color: "#58D1BB", fontSize: "2rem" }}
-                    />
-                  }
-                >
-                  Add new house
-                </Button>
+                <Link style={{ textDecoration: "none" }} to={`addhouse`}>
+                  <Button
+                    id="addNewHouse"
+                    variant="outlined"
+                    style={{
+                      backgroundColor: "#D5D7DF",
+                      borderRadius: "15px",
+                      border: "none",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                    }}
+                    startIcon={
+                      <AddCircleOutlinedIcon
+                        style={{ color: "#58D1BB", fontSize: "2rem" }}
+                      />
+                    }
+                  >
+                    Add new house
+                  </Button>
+                </Link>
               </div>
             </div>
             <Box sx={{ flexGrow: 1 }}>
@@ -218,7 +225,7 @@ function AdminDashboard() {
           </div>
         </div>
       </Grid>
-      <Grid item xs={6} md={4} lg={3} xl={2}>
+      <Grid item xs={6} md={4} lg={2} xl={2}>
         <div className={classes.listingFilters}>
           <div>
             <div item>
