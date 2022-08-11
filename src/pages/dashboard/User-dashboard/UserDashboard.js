@@ -1,365 +1,410 @@
-import React from 'react';
-import {Box, Button, Grid, IconButton, Typography, withStyles} from '@material-ui/core';
-import EditIcon from '@material-ui/icons/Edit';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Popover,
+  Divider,
+} from "@material-ui/core";
+import { Link } from "react-router-dom";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import backEndApi from "../../../services/api";
 import AccountInfo from "./AccountInfo";
 import Loader from "./Loader";
-import ViewLaunchOnHover from './ViewLaunchOnHover'
+import ViewLaunchOnHover from "./ViewLaunchOnHover";
+import ReviewStatusFilter from "../ReviewStatusFilter";
+import Pagination from "@material-ui/lab/Pagination";
+import useStyles from "./UserStyle";
+import ListingStatusFilter from "./ListingStatusFilter";
+import usePagination from "../Pagination";
 
-const useStyles = theme => ({
-    root: {
-        marginTop: '20px',
+function UserDashboard(props) {
+  const [state, setState] = useState({
+    homeDocs: [],
+    userDetail: "",
+    isSwitchOn: false,
+    isHovering: false,
+    hoveredLaunch: "",
+    page: 1,
+    perPage: 2,
+    totalNumber: 0,
+  });
 
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 5;
 
-    },
-    table: {
-        minWidth: 650,
+  const count = Math.ceil(state.totalNumber / PER_PAGE);
+  let _DATA = usePagination(state.homeDocs, state.totalNumber, PER_PAGE);
 
-    },
-    tableContainer: {
-        padding: '12px',
-        borderRadius: '5px',
-        backgroundColor: '#eeeeee',
-        overflow: 'visible'
+  const handleChange = (e, p) => {
+    setPage(p);
+    _DATA.jump(p);
+  };
 
+  const [anchorEl, setAnchorEl] = useState(null);
 
-    },
-    listingStatusF: {
-        [theme.breakpoints.down('md')]: {
-            display: 'none'
-        }
-    },
-    margin: {
-        margin: '5px',
-        fontSize: '15px',
-        borderRadius: '4px',
-        "&:hover": {backgroundColor: 'rgba(58,99,81,0.2)'},
-    },
-    iconBackgroundRed: {
-        backgroundColor: 'rgba(228,130,87,0.21)'
-    },
-    deleteIcon: {
-        color: '#005CC8'
-    },
-    editIcon: {
-        color: '#005CC8'
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    },
-    iconBackgroundBlack: {
-        backgroundColor: 'rgba(57,50,50,0.2)'
-    },
-});
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
-class userDashboard extends React.Component {
-    state = {homeDocs: [], userDetail: '', isSwitchOn: false, isHovering: false, hoveredLaunch: ''};
-    ReviewStatusFilter = (status) => {
-        switch (status) {
+  const classes = useStyles();
 
-            case 'Approved' :
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(29,104,7,0.74)',
-                        color: '#ffffff',
-                        padding: '5px',
-                        paddingRight: '40px',
-                        paddingLeft: '40px',
-                    }}>Approved</span>;
-            case 'Pending' :
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(221,228,87,0.82)',
-                        padding: '5px',
-                        paddingRight: '20px',
-                        paddingLeft: '20px'
-                    }}>Pending Review</span>;
-            case 'Rejected':
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(223,6,18,0.36)',
-                        padding: '5px',
-                        paddingRight: '20px',
-                        paddingLeft: '20px'
-                    }}>Rejected
-                </span>
-            case 'NA':
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(156,5,13,0.36)',
-                        padding: '5px',
-                        paddingRight: '20px',
-                        paddingLeft: '20px'
-                    }}>NA
-                </span>
-            default:
-                return <div>Something occur</div>
-        }
+  useEffect(() => {
+    setState({
+      homeDocs: props.data.homeDocs,
+      userDetail: props.data.docs,
+      totalNumber: props.data.count,
+    });
+  }, []);
 
-    };
-    ListingStatusFilter = (status, id) => {
-        switch (status) {
+  useEffect(() => {
+    setState({
+      homeDocs: props.data.homeDocs,
+      totalNumber: props.data.count,
+      userDetail: props.data.docs,
+    });
+  }, [props.data]);
 
-            case 'Active' :
-                return <span id={id}
-                             style={{
-                                 textTransform: 'none',
-                                 borderRadius: '12.5px',
-                                 backgroundColor: 'rgba(58,99,81,0.2)',
-                                 padding: '5px',
-                                 paddingRight: '20px',
-                                 paddingLeft: '20px'
-                             }}>Active</span>;
-            case 'Inactive' :
-                return <span id={id}
-                             style={{
-                                 textTransform: 'none',
-                                 borderRadius: '12.5px',
-                                 backgroundColor: 'rgba(57,50,50,0.2)',
-                                 padding: '5px',
-                                 paddingRight: '20px',
-                                 paddingLeft: '20px'
-                             }}>Inactive</span>
-            case 'Draft' :
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(57,50,50,0.2)',
-                        padding: '5px',
-                        paddingRight: '20px',
-                        paddingLeft: '20px'
-                    }}>Draft</span>;
-            case 'Submitted' :
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(57,50,50,0.2)',
-                        padding: '5px',
-                        paddingRight: '20px',
-                        paddingLeft: '20px'
-                    }}>Submitted</span>;
-            default:
-                return <div>Something occur</div>
-        }
+  if (!state.homeDocs) {
+    /*window.location.reload()*/
+  }
 
-    };
-    onSwitchChange = async (e) => {
-        console.log(e.target.name);
-        console.log(e.target.checked);
-        console.log(e.target.id);
-
-        const response = await backEndApi.post('/activateButton', {
-            params: {
-                isActive: e.target.checked,
-                id: e.target.name
-            }
-        });
-        console.log(response.data);
-        window.location.reload(false);
-        if (response.data === "Active") {
-            /* document.getElementById(nameTag).innerText = 'Active';
+  const onSwitchChange = async (e) => {
+    const response = await backEndApi.post("/activateButton", {
+      params: {
+        isActive: e.target.checked,
+        id: e.target.name,
+      },
+    });
+    console.log(response.data);
+    window.location.reload(false);
+    if (response.data === "Active") {
+      /* document.getElementById(nameTag).innerText = 'Active';
              document.getElementById(switchId).checked = true;
 
              this.setState({isSwitchOn: true});*/
-
-        } else if (response.data === "Inactive") {
-            /*document.getElementById(nameTag).innerText = 'Inactive';
+    } else if (response.data === "Inactive") {
+      /*document.getElementById(nameTag).innerText = 'Inactive';
             document.getElementById(switchId).checked = false;
 
             this.setState({isSwitchOn:false})*/
-        } else {
-            alert("Unhandled Conditions");
-        }
-    };
-    switchChecked = (row) => {
-
-        /*row.id = */
-        /* if(row.listingStatus === "Active") {
-
-         }else{
-
-         }*/
-        return row.listingStatus === "Active"
-
-    };
-    componentWillMount = async () => {
-        const config = {
-            headers: {
-                'x-access-token': JSON.parse(localStorage.getItem('token')).token
-            }
-        };
-        const response = await backEndApi.get('/dashboard', config);
-        console.log(response.data);
-        this.setState({homeDocs: response.data.homeDocs, userDetail: response.data.docs});
-
-    };
-
-    render() {
-        // const displaySwitch = (row) => {
-        //     if (row.listingStatus === "Active" || row.listingStatus === "Inactive") {
-        //         return <Tooltip title={"Activate"} placement="top-start" arrow>
-        //             <Switch
-        //                 /*checked={this.switchChecked(row)}*//*{state.checkedA}*/
-        //                 checked={this.switchChecked(row)}
-        //                 onClick={this.onSwitchChange}/*{handleChange}*/
-        //                 name={row._id}
-        //                 id={row._id}
-        //                 color={'primary'}
-        //                 inputProps={{'aria-label': 'primary checkbox'}}
-
-
-        //             /></Tooltip>
-        //     } else {
-        //         return <Tooltip title={"Activate"} placement="top-start" arrow>
-        //             <Switch
-        //                 /*checked={this.switchChecked(row)}*//*{state.checkedA}*/
-        //                 disabled
-        //                 onClick={this.onSwitchChange}/*{handleChange}*/
-        //                 name={row._id}
-        //                 id={row._id}
-        //                 inputProps={{'aria-label': 'secondary checkbox'}}
-
-        //             /></Tooltip>
-        //     }
-        // };
-        if (!this.state.homeDocs) {
-            /*window.location.reload()*/
-
-        }
-        /*const token = this.props.getToken();*/
-        /*console.log(token);*/
-        const {classes} = this.props;
-        /* if (!token) {
-             return <Redirect to='/login'/>
-         }*/
-        const productRow = () => (this.state.homeDocs ? this.state.homeDocs.map((row) => (
-                    <TableRow key={row._id}>
-                        <TableCell component="th" scope="row">
-                            {row.location}
-
-                        </TableCell>
-
-                        <TableCell style={{textAlign: 'center'}} className={classes.listingStatusF}>
-
-                            {this.ListingStatusFilter(row.listingStatus, row._id)}
-                        </TableCell>
-
-                        <TableCell style={{textAlign: 'center'}}>{this.ReviewStatusFilter(row.reviewStatus)}</TableCell>
-                        <TableCell style={{textAlign: 'center'}}>
-                            <IconButton aria-label="delete"
-                                        className={classes.iconBackgroundRed}
-                                        style={{padding:'5px',
-                                                margin:'5px',
-                                                fontSize:'15px',
-                                                borderRadius:'4px'
-                                            }}
-                                        size="small"
-                                        href={"/editHouse/" + row._id}
-
-                            >
-                                <EditIcon fontSize="inherit" className={classes.editIcon}/>
-                            </IconButton>
-                            {/*<IconButton aria-label="delete"
-                                    className={[classes.margin, classes.iconBackgroundRed]}
-                                    size="small">
-                            <DeleteIcon fontSize="inherit" className={classes.deleteIcon}/>
-                        </IconButton>*/}
-
-
-                            <span style={{position: 'relative', top: 'auto', zIndex: 9,}}>
-                                            <span
-                                                style={{
-                                                    position: 'absolute',
-                                                    right: '100%',
-                                                    width: '600px',
-                                                    height: '20px'
-                                                }}>
-                                                {this.state.isHovering && this.state.hoveredLaunch === row._id ?
-                                                    <ViewLaunchOnHover row={row}/> : ''}
-                                            </span>
-                                    </span>
-                            {/*onMouseLeave={()=>{this.handleHover(row._id)}}*/}
-                            {/*{displaySwitch(row)}*/}
-
-
-                            {/* {row.protein}*/}
-                        </TableCell>
-                    </TableRow>)) :
-                <Loader/>
-        );
-        return (
-            <Grid container className={classes.root} spacing={4}>
-                <Grid item md={9}>
-                    <Box>
-
-                        <Grid container style={{marginBottom: '5px'}}>
-                            <Grid item xs={3} md={3}>
-                                <Typography variant='h5'>Your houses</Typography>
-                            </Grid>
-                            <Grid item xs={6} sm={6} md={6}></Grid>
-                            <Grid item xs={3} md={3} align='right'>
-                                <Button id="addNewHouse" href='/addhouse' style={{
-                                    background: '#005CC8',
-                                    textTransform: 'none',
-                                    color: '#ffffff',
-                                    borderRadius: '5px',
-                                    paddingLeft: '20px',
-                                    paddingRight: '20px',
-                                }}>+ Add new house</Button>
-                            </Grid>
-                        </Grid>
-                        <Box><TableContainer component={Paper} className={classes.tableContainer}>
-                            <Table className={classes.table} size="small" aria-label="a dense table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>
-                                            <Typography variant='h6' style={{fontSize: '16px'}}>Location</Typography>
-                                        </TableCell>
-                                        <TableCell style={{textAlign: 'center'}} className={classes.listingStatusF}>
-                                            <Typography variant='h6' style={{fontSize: '16px'}} >Listing
-                                                status</Typography>
-                                        </TableCell>
-                                        <TableCell style={{textAlign: 'center'}}><Typography variant='h6'
-                                                                                             style={{fontSize: '16px'}}>Review
-                                            status</Typography></TableCell>{/*Fat&nbsp;(g)*/}
-
-                                        <TableCell style={{textAlign: 'center'}} align='justify'><Typography
-                                            variant='h6' style={{fontSize: '16px'}}>Action</Typography></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {productRow()}
-
-                                </TableBody>
-                            </Table>
-                        </TableContainer></Box>
-                    </Box>
-                </Grid>
-                <Grid item md={3} style={{marginTop: '2px'}}>
-                    <AccountInfo userDetail={this.state.userDetail}/>
-                </Grid>
-            </Grid>
-        );
+    } else {
+      alert("Unhandled Conditions");
     }
+  };
+  const switchChecked = (row) => {
+    return row.listingStatus === "Active";
+  };
 
+  const productRow = () =>
+    state.homeDocs ? (
+      _DATA.currentData().map((row) => (
+        <Grid container spacing={2} className={classes.tableRow} key={row._id}>
+          <Grid item xs={4} className={classes.gridElement}>
+            {row.location}
+          </Grid>
+
+          <Grid
+            item
+            xs={3}
+            className={classes.gridElement}
+            style={{
+              textAlign: "center",
+            }}
+            // className={classes.listingStatusF}
+          >
+            {ListingStatusFilter(row.listingStatus, row._id)}
+          </Grid>
+
+          <Grid
+            item
+            xs={3}
+            className={classes.gridElement}
+            style={{
+              textAlign: "center",
+            }}
+          >
+            {ReviewStatusFilter(row.reviewStatus)}
+          </Grid>
+          <Grid
+            item
+            xs={2}
+            className={classes.gridElement}
+            style={
+              {
+                // paddingLeft: "3rem",
+              }
+            }
+          >
+            <IconButton
+              aria-label="delete"
+              className={classes.iconBackgroundRed}
+              style={{
+                padding: "5px",
+                margin: "5px",
+                fontSize: "15px",
+                borderRadius: "4px",
+                height: "100% ",
+              }}
+              size="large"
+              // href={"/editHouse/" + row._id}
+            >
+              <MoreVertIcon
+                onClick={handleClick}
+                fontSize="inherit"
+                style={{ fontSize: "1.25rem", height: "100% " }}
+                className={classes.editIcon}
+              />
+              <Popover
+                anchorOrigin={{
+                  vertical: "0",
+                  horizontal: "20",
+                }}
+                style={{
+                  position: "absolute",
+                  marginTop: "-2.25rem",
+                }}
+                id={id}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+              >
+                <div
+                  style={{
+                    width: "12rem",
+                    // height: "10rem",
+                    padding: "1rem 0 0rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      padding: ".5rem 0",
+                      color: "#9FA2B4",
+                      fontSize: "16px",
+                    }}
+                  >
+                    Action
+                  </div>
+                  <Divider />
+
+                  <Link
+                    style={{
+                      textDecoration: "none",
+                      border: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#9FA2B4",
+                      fontSize: "14px",
+                    }}
+                    to={`editHouse/${row._id}`}
+                  >
+                    <Button
+                      style={{
+                        border: "none",
+                        width: "100%",
+                      }}
+                      id="addNewHouse"
+                      // href={"/dashboard"}
+                      variant="outlined"
+                      className={classes.popover}
+                      startIcon={
+                        <EditIcon
+                          style={{ color: "#58D1BB", fontSize: "1rem" }}
+                        />
+                      }
+                    >
+                      Edit
+                    </Button>
+                  </Link>
+
+                  <Divider />
+                  <Link
+                    style={{
+                      textDecoration: "none",
+                      border: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      padding: ".5rem 0",
+                      color: "#9FA2B4",
+                      fontSize: "14px",
+                    }}
+                    // to={`editHouse/${row._id}`}
+                  >
+                    <Button
+                      id="addNewHouse"
+                      // href={"/dashboard"}
+                      variant="outlined"
+                      className={classes.popover}
+                      style={{
+                        border: "none",
+                        width: "100%",
+                      }}
+                      startIcon={
+                        <DeleteIcon
+                          style={{ color: "#F24545", fontSize: "1rem" }}
+                        />
+                      }
+                    >
+                      Delete
+                    </Button>
+                  </Link>
+                </div>
+              </Popover>
+            </IconButton>
+            <span style={{ position: "relative", top: "auto", zIndex: 9 }}>
+              <span
+                style={{
+                  position: "absolute",
+                  right: "100%",
+                  width: "600px",
+                  height: "20px",
+                }}
+              >
+                {state.isHovering && state.hoveredLaunch === row._id ? (
+                  <ViewLaunchOnHover row={row} />
+                ) : (
+                  ""
+                )}
+              </span>
+            </span>
+          </Grid>
+        </Grid>
+      ))
+    ) : (
+      <Loader />
+    );
+
+  return (
+    <Grid
+      container
+      className={classes.root}
+      spacing={1}
+      style={{ display: "flex", justifyContent: "space-around" }}
+    >
+      <Grid xs={12} md={8} lg={9} xl={9}>
+        <Box>
+          <Grid container style={{ marginBottom: "20px" }}>
+            <Grid item xs={4} md={3} sm={5}>
+              <div style={{ alignSelf: "center" }}>
+                <span
+                  style={{
+                    marginBottom: "20px",
+                    fontSize: "22px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  List of Houses
+                </span>
+              </div>{" "}
+            </Grid>
+            <Grid item xs={3} sm={3} md={5}></Grid>
+            <Grid item xs={5} md={4} sm={4} align="right">
+              <Link style={{ textDecoration: "none" }} to={`addhouse`}>
+                <Button
+                  id="addNewHouse"
+                  variant="outlined"
+                  className={classes.heroBtn}
+                  style={{
+                    backgroundColor: "#D5D7DF",
+                    borderRadius: "15px",
+                    border: "none",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                  }}
+                  startIcon={
+                    <AddCircleOutlinedIcon
+                      style={{ color: "#58D1BB", fontSize: "2rem" }}
+                    />
+                  }
+                >
+                  Add new house
+                </Button>
+              </Link>
+            </Grid>
+          </Grid>
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid
+              container
+              spacing={2}
+              className={classes.tableHeader}
+              style={{ border: "1.5px solid #3293A8" }}
+            >
+              <Grid item xs={4} className={classes.gridHeader}>
+                Location
+              </Grid>
+              <Grid
+                item
+                xs={3}
+                className={classes.gridHeader}
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                Listing Status
+              </Grid>
+              <Grid
+                item
+                xs={3}
+                className={classes.gridHeader}
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                Review status
+              </Grid>
+              <Grid
+                item
+                xs={2}
+                className={classes.gridHeader}
+                style={{
+                  paddingLeft: "0rem",
+                  verticalAlign: "baseline",
+                  // textAlign: "center",
+                }}
+              >
+                Action
+              </Grid>
+            </Grid>
+            <>{productRow()}</>
+            {state.totalNumber > 5 ? (
+              <Pagination
+                count={count}
+                size="large"
+                page={page}
+                onChange={handleChange}
+                className={classes.paginationStyle}
+                variant="outlined"
+                color="primary"
+              />
+            ) : (
+              ""
+            )}
+          </Box>
+        </Box>
+      </Grid>
+      <Grid item xs={6} md={3} lg={2} xl={2}>
+        <AccountInfo userDetail={state.userDetail} />
+      </Grid>
+    </Grid>
+  );
 }
 
-export default withStyles(useStyles)(userDashboard);
-
-
+export default UserDashboard;

@@ -1,9 +1,15 @@
-import React, {useEffect, useState} from 'react'
-import UserDashboard from './User-dashboard/UserDashboard'
-import AdminDashboard from './Admin-dashboard/AdminDashboard'
+import React, { useEffect, useState } from "react";
+import UserDashboard from "./User-dashboard/UserDashboard";
+import AdminDashboard from "./Admin-dashboard/AdminDashboard";
 import backEndApi from "../../services/api";
 import Loader from "./User-dashboard/Loader";
-import {Redirect} from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getDashboardData,
+  getFilterDashboardData,
+} from "../../features/dashboard/dashboardSlice";
+// import { houseStateCleaner } from "../../features/house/houseSlice";
 
 // const useStyles = theme => ({
 //     root: {
@@ -39,60 +45,63 @@ import {Redirect} from "react-router-dom";
 //     },
 // });
 
+export default function Dashboard(props) {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const { data, isSuccess, isLoading, isError, errorMessage } = useSelector(
+    (state) => state.dashboard
+  );
+  const [auth, setAuth] = useState("");
+  const [isAuth, setIsAuth] = useState(true);
 
-export default function Dashboard(props){
-    const [auth, setAuth] = useState('')
-    const [isAuth, setIsAuth] = useState(true)
+  const onRadioGroupChange = (e) => {
+    dispatch(getFilterDashboardData(e));
+  };
 
-    const authenticate = () => {
-
-        if (auth === "Admin") {
-            return <AdminDashboard {...props} getToken={props.getToken}/>
-        } else if (auth === "User") {
-            return <UserDashboard getToken={props.getToken}/>
-        } else if (auth === '') {
-
-            return <div>
-                <Loader/>
-            </div>
-
-        }
-    };
-
-    useEffect( () => {
-      const  checkLocalStorage=async()=>{
-            if (localStorage.getItem(('token'))) {
-
-                const config = {
-                    headers: {
-                        'x-access-token': JSON.parse(localStorage.getItem('token')).token
-                    }
-                };
-                const response = await backEndApi.get('/dashboard', config);
-                console.log(response.data);
-
-
-                setAuth(response.data.auth);
-            } else {
-                setIsAuth(false)
-            }
-        }
-        checkLocalStorage()
-    }, []);
-
-    useEffect(() => {
-        if (!isAuth) {
-            return <Redirect to='/'/>
-        }
-    }, [isAuth])
-
-    return (
+  const authenticate = () => {
+    if (data.auth === "Admin") {
+      return (
+        <AdminDashboard
+          {...props}
+          data={data}
+          onRadioGroupChange={onRadioGroupChange}
+        />
+      );
+    } else if (data.auth === "User") {
+      return <UserDashboard data={data} />;
+    } else if (auth === "") {
+      return (
         <div>
-
-            {authenticate()}
-
+          <Loader />
         </div>
-    );
+      );
+    }
+  };
 
+  useEffect(() => {
+    // const checkLocalStorage = () => {
+    // if (localStorage.getItem("token")) {
+    //   const config = {
+    //     headers: {
+    //       "x-access-token": JSON.parse(localStorage.getItem("token")),
+    //     },
+    //   };
+    //   const response = await backEndApi.get("/dashboard", config);
+    // setAuth(response.data.auth);
+    // } else {
+    //   setIsAuth(false);
+    // }
+    // };
+    dispatch(getDashboardData());
+    // dispatch(houseStateCleaner);
+    // checkLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    if (!isAuth) {
+      history.push("/");
+    }
+  }, [isAuth]);
+
+  return <div>{isSuccess && authenticate()}</div>;
 }
-

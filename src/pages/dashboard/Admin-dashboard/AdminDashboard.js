@@ -1,399 +1,337 @@
-import React from 'react';
-import {Box, Button, FormControl, FormControlLabel, withStyles} from '@material-ui/core';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import moment from 'moment'
-import backEndApi from '../../../services/api'
-import MyModal from './Modal';
-import {Redirect} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  styled,
+} from "@material-ui/core";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import moment from "moment";
+import backEndApi from "../../../services/api";
+import Pagination from "@material-ui/lab/Pagination";
+import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
+import { Redirect, Link } from "react-router-dom";
+import usePagination from "../Pagination";
+import useStyles from "./AdminStyle";
+import ReviewStatusFilter from "../ReviewStatusFilter";
+import AdminDrawer from "../../../components/AdminDrawer";
+import { useSelector } from "react-redux";
 
-const useStyles = theme => ({
-    root: {
-        display:'flex',
-        flexWrap:'warp',
-        flexDirection:'row',
-        justifyContent:'space-around',
-        gap:'20px',
-        marginTop: '20px',
-        [theme.breakpoints.down('sm')]: {
-            flexDirection:'column'
-        },
-        '& span': {fontSize:'clamp(0.8rem, -0.075rem + 1.533vw, 1.2rem)'},
+function AdminDashboard(props) {
+  const [state, setState] = useState({
+    homeDocs: [],
+    isReRender: false,
+    filterSelected: "",
+    isRedirect: false,
+    redirectTo: "",
+    page: 1,
+    perPage: 2,
+    totalNumber: 0,
+  });
 
-        '& th':{
-            fontSize:'clamp(0.7rem, -0.075rem + 1.533vw, 1rem)',
-        },
-    },
-    table: {
-    },
-    tableContainer: {
-        display:'flex',
-        width:'100%',
-        justifyContent:'space-around',
-        padding: '10px',
-        borderRadius: '5px',
-        backgroundColor: '#eeeeee',
+  props.setSideBar(true);
 
+  const { isSuccess } = useSelector((state) => state.dashboard);
 
-    },
-    margin: {
-        margin: '5px',
-        fontSize: '15px',
-        borderRadius: '4px',
-        "&:hover": {backgroundColor: '#3A6351'},
-    },
-    iconBackgroundRed: {
-        backgroundColor: 'rgba(228,130,87,0.21)'
-    },
-    deleteIcon: {
-        color: '#F24545'
-    },
-    editIcon: {
-        color: '#E48257'
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 5;
 
-    },
-    iconBackgroundBlack: {
-        backgroundColor: 'rgba(57,50,50,0.2)'
-    },
-    formControlLabel: {
-        marginTop: '8px',
-        marginBottom: '8px',
-        display: 'flex',
-        padding: '5px 0',
-        justifyContent: "space-between",
-        "& span": {},
+  props.setSideBar(true);
 
-        "& svg": {
-            boxSizing: 'border-box',
-            borderRadius: '0px',
+  const count = Math.ceil(state.totalNumber / PER_PAGE);
+  let _DATA = usePagination(state.homeDocs, state.totalNumber, PER_PAGE);
 
-        },
-        "& .MuiRadio-colorPrimary.Mui-checked": {
-            color: 'rgb(90,109,255)',
+  const handleChange = (e, p) => {
+    setPage(p);
+    _DATA.jump(p);
+  };
 
-        },
-        "& .MuiRadio-root": {
-            color: '#747474',
+  const classes = useStyles();
 
-        }
+  useEffect(() => {
+    setState({
+      homeDocs: props.data.homeDocs,
+      totalNumber: props.data.count,
+    });
+  }, []);
 
-    },
-    formControlCustom: {
-        marginTop: '5px'
-    },
-    allLaunchesLabel: {
-        border: '0.5px solid rgba(228, 130, 87, 0.3)',
-        borderRadius: '5px',
+  useEffect(() => {
+    setState({
+      homeDocs: props.data.homeDocs,
+      totalNumber: props.data.count,
+    });
+  }, [props.data]);
 
-    },
-    myCheckbox: {
-        marginLeft: '125px',
-        width: '22px',
-        height: '22px',
-        boxSizing: 'border-box',
-        borderRadius: '4px',
+  const onRadioGroupChange = (e) => {
+    props.onRadioGroupChange(e.target.value);
 
-        "& .Mui-checked": {
-            border: '0px solid #393232'
-        }
-    },
+    // setState({
+    //   homeDocs: props.data.homeDocs,
+    //   totalNumber: props.data.count,
+    // });
+  };
 
-    submittedDateF: {
-        [theme.breakpoints.down('sm')]: {
-            display: 'none'
-        }
-    },
-    listingFilters:{
-        minWidth:'350px',
-        [theme.breakpoints.down('xs')]: {
-            minWidth: '100%'
-        }
+  const reRender = (isReRender) => {
+    setState({ isReRender: isReRender });
+  };
+  const onTableRowClick = (row) => {
+    setState({ isRedirect: true, redirectTo: row._id });
+  };
 
-    }
-});
+  if (state.isRedirect) {
+    return <Redirect to={`/adminDetail/${state.redirectTo}`} />;
+  }
+  if (state.isReRender) {
+    window.location.reload(false);
+  }
 
-
-class AdminDashboard extends React.Component {
-    state = {homeDocs: [], isReRender: false, filterSelected: '', isRedirect:false, redirectTo:''};
-    componentDidMount = async () => {
-        const config = {
-            headers: {
-                'x-access-token': JSON.parse(localStorage.getItem('token')).token
-            }
-        };
-        const response = await backEndApi.get('/dashboard', config);
-        console.log(response.data);
-        this.setState({
-            homeDocs: response.data.homeDocs,
-
-        });
-    };
-
-    onRadioGroupChange = async (e) => {
-        console.log(e.target.value);
-        this.setState({filterSelected: e.target.value});
-        const config = {
-            headers: {
-                'x-access-token': JSON.parse(localStorage.getItem('token')).token
-            },
-            params: {filter: e.target.value}
-        };
-        const response = await backEndApi.get('/dashboard', config);
-        this.setState({homeDocs: response.data.homeDocs});
-        console.log(response.data.product)
-    };
-    ReviewStatusFilter = (status) => {
-        switch (status) {
-
-            case 'Approved' :
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(58,99,81,0.2)',
-                        padding: '5px',
-                        paddingRight: '40px',
-                        paddingLeft: '40px'
-                    }}>Approved</span>;
-            case 'Pending' :
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(243,251,96,0.28)',
-                        padding: '5px 25px',
-
-                    }}>Pending</span>;
-            case 'Rejected':
-                return <span
-                    style={{
-                        textTransform: 'none',
-                        borderRadius: '12.5px',
-                        backgroundColor: 'rgba(223,6,18,0.36)',
-                        padding: '5px',
-                        paddingRight: '20px',
-                        paddingLeft: '20px'
-                    }}>Rejected
+  return (
+    <Grid className={classes.root} spacing={1}>
+      <Grid item xs={12} md={2} lg={1} xl={2}>
+        {/* <Grid item xs={12} md={2} lg={1} xl={2}>
+          <div style={{ display: "flex" }}>
+            {isSuccess ? props.data.auth == "Admin" ? <AdminDrawer /> : "" : ""}
+            <h3 style={{ fontSize: "30px", margin: 0, color: "black" }}></h3>
+          </div>
+        </Grid> */}
+      </Grid>
+      <Grid item xs={12} md={7} lg={7} xl={6}>
+        <div style={{ width: "100%" }}>
+          <div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "10px",
+              }}
+            >
+              <div style={{ alignSelf: "center" }}>
+                <span
+                  style={{
+                    marginBottom: "20px",
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  List of Houses
                 </span>
-            default:
-                return <div>Something occur</div>
-        }
-
-    };
-    reRender = (isReRender) => {
-        this.setState({isReRender: isReRender})
-    };
-    onTableRowClick = (row) =>{
-        console.log(row._id);
-        this.setState({isRedirect:true,redirectTo:row._id})
-    };
-    render() {
-        const {classes} = this.props;
-        if(this.state.isRedirect){
-          return  <Redirect
-                to={`/adminDetail/${this.state.redirectTo}`}
-            />
-        }
-        if (this.state.isReRender) {
-            window.location.reload(false);
-
-        }
-        return (
-            <div  className={classes.root} spacing={4}>
-                <div  style={{width:'100%'}} >
-                    <div>
-                        <div style={{display:'flex', justifyContent:'space-between', marginBottom:'10px'}}>
-                            <div style={{alignSelf:'center'}}>
-                                <span style={{marginBottom:'20px'}}>All Listing Reviews</span>
-                            </div>
-                            <div >
-                                <Button id="addNewHouse" href='/addhouse' style={{
-                                    background: '#005CC8',
-                                    textTransform: 'none',
-                                    color: '#F2EDD7',
-                                    borderRadius: '5px',
-                                    paddingLeft: '20px',
-                                    paddingRight: '20px',
-                                }}>+ Add new house</Button>
-                            </div>
-
-                        </div>
-                        <Box>
-                            <TableContainer component={Paper} className={classes.tableContainer}>
-                            <Table className={classes.table} size="small" aria-label="a dense table">
-                                <TableHead>
-                                    <TableRow id="userInfo">
-                                        <TableCell>
-                                            <span  >Product name</span>
-                                        </TableCell>
-                                        <TableCell style={{textAlign:'center'}} className={classes.submittedDateF} >
-                                            <span  >Submitted Date</span>
-                                        </TableCell>
-                                        <TableCell style={{textAlign:'center'}}>
-                                            <span >Review
-                                            status</span>
-                                        </TableCell>{/*Fat&nbsp;(g)*/}
-                                        <TableCell style={{textAlign:'center'}}  >
-                                            <span
-                                             >Action</span>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody >
-                                    {this.state.homeDocs?
-                                        this.state.homeDocs.map((row) => (
-                                            <TableRow key={row._id} onClick={()=>this.onTableRowClick(row)}  style={{cursor:'pointer'}}>
-                                                <TableCell component="th" scope="row" style={{ width:'15%'}}>
-                                                    {row.location}
-                                                </TableCell>
-
-                                                <TableCell style={{textAlign:'center', width:'20%'}} className={classes.submittedDateF}>
-                                                    {moment(row.dateCreated).format("D/M/yyyy")}
-
-                                                </TableCell>
-
-                                                <TableCell style={{textAlign:'center',width:'20%'}}>{this.ReviewStatusFilter(row.reviewStatus)}</TableCell>
-                                                <TableCell style={{textAlign:'center',width:'20%'}}>
-
-                                                    <div>
-                                                        {/* <IconButton aria-label="delete"
-                                                                    className={[classes.margin, classes.iconBackgroundRed]}
-                                                                    size="small">
-                                                            <EditIcon fontSize="inherit" className={classes.editIcon}/>
-                                                        </IconButton>
-                                                        <IconButton aria-label="delete"
-                                                                    className={[classes.margin, classes.iconBackgroundRed]}
-                                                                    size="small">
-                                                            <DeleteIcon fontSize="inherit"
-                                                                        className={classes.deleteIcon}/>
-                                                        </IconButton>*/}
-                                                        <MyModal docs={row} reRender={this.reRender}/>
-
-
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        )):""}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        </Box>
-                    </div>
-                </div>
-                <div className={classes.listingFilters}>
-                    <div >
-                        <div item >
-                            <span  style={{marginBottom:'9px'
-                            }}> Listing Filters</span>
-                        </div>
-
-                    </div>
-                    <div  style={{
-                        marginTop: '10px',
-                        backgroundColor: '#eeeeee',
-
-                        boxShadow: '-9px 9px 16px rgba(0, 0, 0, 0.05)',
-                        borderRadius: '5px'
-                    }}>
-                        <div>
-                            <FormControl required component="fieldset" className={classes.formControlCustom}>
-                                <RadioGroup aria-label='gender' name='Listing' onChange={this.onRadioGroupChange}>
-
-
-                                    {/*<FormControlLabel
-                                        control={<Radio name="Construction" color='primary'
-                                                        className={classes.myCheckbox}/>}
-
-                                        value="Sort by name"
-                                        label="Sort by name"
-                                        labelPlacement='start'
-                                        className={classes.formControlLabel}
-
-
-                                    />*/}
-
-                                    <FormControlLabel
-
-                                        id="Pending"
-                                        control={<Radio name="Construction" color='primary'
-                                                        className={classes.myCheckbox}/>}
-                                        value="Pending"
-                                        label="Pending Review"
-                                        labelPlacement='start'
-                                        className={classes.formControlLabel}
-
-
-                                    />
-                                    <FormControlLabel
-
-                                        id="Rejected"
-                                        control={<Radio name="Construction" color='primary'
-                                                        className={classes.myCheckbox}/>}
-                                        value="Rejected"
-                                        label="Rejected"
-                                        labelPlacement='start'
-                                        className={classes.formControlLabel}
-
-
-                                    />
-
-                                    <FormControlLabel
-                                        id="Approved"
-                                        control={<Radio name="Construction" color='primary'
-                                                        className={classes.myCheckbox}/>}
-                                        value="Approved"
-                                        label="Approved"
-                                        labelPlacement='start'
-                                        className={classes.formControlLabel}
-
-                                    />
-                                    <FormControlLabel
-
-                                        control={<Radio name="Construction" color='primary'
-                                                        className={classes.myCheckbox} id="AllStatus"/>}
-                                        value="All Status"
-                                        label="All Status"
-                                        labelPlacement='start'
-                                        className={classes.formControlLabel}
-
-
-                                    />
-                                    <FormControlLabel
-
-                                        control={<Radio name="Construction" color='primary'
-                                                        className={classes.myCheckbox} id="SortByDate" />}
-                                        value='Sort by date'
-                                        label="Sort by date"
-                                        labelPlacement='start'
-                                        className={classes.formControlLabel}
-
-
-                                    />
-
-                                </RadioGroup>
-                                {/*<Box mt={4}>
-                                        <Typography align='center'>
-                                            <Button style={{textTransform: 'none',}}>See More</Button>
-                                        </Typography></Box>*/}
-
-                            </FormControl>
-
-                        </div>
-                    </div>
-                </div>
-
+              </div>
+              <div>
+                <Link style={{ textDecoration: "none" }} to={`addhouse`}>
+                  <Button
+                    id="addNewHouse"
+                    variant="outlined"
+                    style={{
+                      backgroundColor: "#D5D7DF",
+                      borderRadius: "15px",
+                      border: "none",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                    }}
+                    startIcon={
+                      <AddCircleOutlinedIcon
+                        style={{ color: "#58D1BB", fontSize: "2rem" }}
+                      />
+                    }
+                  >
+                    Add new house
+                  </Button>
+                </Link>
+              </div>
             </div>
-        );
-    }
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid
+                container
+                spacing={2}
+                className={classes.tableHeader}
+                style={{ border: "1.5px solid #3293A8" }}
+              >
+                <Grid item xs={4} className={classes.gridHeader}>
+                  Location
+                </Grid>
+                <Grid
+                  item
+                  xs={4}
+                  className={classes.gridHeader}
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  Submitted Date
+                </Grid>
+                <Grid
+                  item
+                  xs={4}
+                  className={classes.gridHeader}
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  Review status
+                </Grid>
+              </Grid>
+              {state.homeDocs
+                ? _DATA.currentData().map((row) => (
+                    <Grid
+                      container
+                      spacing={2}
+                      onClick={() => onTableRowClick(row)}
+                      className={classes.tableRow}
+                      key={row._id}
+                    >
+                      <Grid item xs={4} className={classes.gridElement}>
+                        {row.location}
+                      </Grid>
+                      <Grid
+                        item
+                        xs={4}
+                        className={classes.gridElement}
+                        style={{
+                          textAlign: "center",
+                        }}
+                      >
+                        {moment(row.dateCreated).format("D/M/yyyy")}{" "}
+                      </Grid>
+                      <Grid
+                        item
+                        xs={4}
+                        className={classes.gridElement}
+                        style={{
+                          textAlign: "center",
+                        }}
+                      >
+                        {ReviewStatusFilter(row.reviewStatus)}
+                      </Grid>
+                    </Grid>
+                  ))
+                : ""}
+              {state.totalNumber > 5 ? (
+                <Pagination
+                  count={count}
+                  size="large"
+                  page={page}
+                  onChange={handleChange}
+                  className={classes.paginationStyle}
+                  variant="outlined"
+                  color="primary"
+                />
+              ) : (
+                ""
+              )}
+            </Box>
+          </div>
+        </div>
+      </Grid>
+      <Grid item xs={6} md={4} lg={2} xl={2}>
+        <div className={classes.listingFilters}>
+          <div>
+            <div item>
+              <span style={{ marginBottom: "9px" }}> Listing Filters</span>
+            </div>
+          </div>
+          <div
+            style={{
+              marginTop: "10px",
+              backgroundColor: "#eeeeee",
+              boxShadow: "-9px 9px 16px rgba(0, 0, 0, 0.05)",
+              borderRadius: "5px",
+            }}
+          >
+            <div>
+              <FormControl
+                required
+                component="fieldset"
+                className={classes.formControlCustom}
+              >
+                <RadioGroup
+                  aria-label="filter"
+                  name="Listing"
+                  onChange={onRadioGroupChange}
+                >
+                  <FormControlLabel
+                    id="AllStatus"
+                    control={
+                      <Radio
+                        name="Construction"
+                        color="primary"
+                        className={classes.myCheckbox}
+                      />
+                    }
+                    value="All Status"
+                    label="All Status"
+                    labelPlacement="start"
+                    className={classes.formControlLabel}
+                  />
 
+                  <FormControlLabel
+                    id="Pending"
+                    control={
+                      <Radio
+                        name="Construction"
+                        color="primary"
+                        className={classes.myCheckbox}
+                      />
+                    }
+                    value="Pending"
+                    label="Pending Review"
+                    labelPlacement="start"
+                    className={classes.formControlLabel}
+                  />
+                  <FormControlLabel
+                    id="Rejected"
+                    control={
+                      <Radio
+                        name="Construction"
+                        color="primary"
+                        className={classes.myCheckbox}
+                      />
+                    }
+                    value="Rejected"
+                    label="Rejected"
+                    labelPlacement="start"
+                    className={classes.formControlLabel}
+                  />
+
+                  <FormControlLabel
+                    id="Approved"
+                    control={
+                      <Radio
+                        name="Construction"
+                        color="primary"
+                        className={classes.myCheckbox}
+                      />
+                    }
+                    value="Approved"
+                    label="Approved"
+                    labelPlacement="start"
+                    className={classes.formControlLabel}
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        name="Construction"
+                        color="primary"
+                        className={classes.myCheckbox}
+                        id="SortByDate"
+                      />
+                    }
+                    value="Sort by date"
+                    label="Sort by date"
+                    labelPlacement="start"
+                    className={classes.formControlLabel}
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+          </div>
+        </div>
+      </Grid>
+    </Grid>
+  );
 }
 
-export default withStyles(useStyles)(AdminDashboard);
-
+export default AdminDashboard;
