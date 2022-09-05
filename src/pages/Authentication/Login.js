@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core";
+import {
+
+  makeStyles,
+} from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
 
 import Button from "@material-ui/core/Button";
@@ -9,105 +12,133 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { loginUser } from "../../features/auth/authSlice";
 import { useHistory } from "react-router-dom";
+import { useUserAuth } from "../../context/UserAuthContext";
+
+
 import backEndApi from "../../services/api";
+import { Redirect } from "react-router-dom";
 
-const loginImage = process.env.PUBLIC_URL + "/img/image.png";
+const SignupImage = process.env.PUBLIC_URL + "/img/new.jpg";
+
 const useStyles = makeStyles((theme) => ({
-  container: {
-    width: "100%",
-    paddingLeft: "16px",
-    paddingRight: "16px",
-    [theme.breakpoints.down("sm")]: {
-      paddingLeft: 5,
-      paddingRight: 5,
-    },
-  },
-  root: {
-    display: "flex",
-    justifyContent: "space-around",
-    flexWrap: "wrap",
-    background: "rgba(238,238,238,0.87)",
-    borderRadius: "15px",
-    height: "100vh",
-    padding: 10,
-    "& a": {
-      color: "#5066e4",
-    },
-
-    [theme.breakpoints.down("sm")]: {
-      "& form": {
-        padding: 0,
+    container: {
+        display:'flex',
+        justifyContent:'center',
+        
+        width: "100%",
+        paddingLeft: "6px",
+        paddingRight: "6px",
+        [theme.breakpoints.down("sm")]: {
+          paddingLeft: 5,
+          paddingRight: 5,
+        },
       },
-    },
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: "40vh",
-    width: "100%",
-    [theme.breakpoints.down("sm")]: {},
-  },
+      root: {
+        display: "flex",
+        width:'80%',
+        border: "1px solid rgba(0, 0, 0, .2)",
+        justifyContent:'space-around',
+        flexWrap: "nowrap",
+        background: "white",
+        borderRadius: "15px",
+        height: "650px",
+        padding: 10,
+        "& a": {
+          color: "#3A6351",
+        },
+    
+        [theme.breakpoints.down("sm")]: {
+          "& form": {
+            padding: 0,
+          },
+        },
+      },
+      avatar: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.secondary.main,
+      },
+      form: {
+        marginLeft:'205px',
+        width: "90%",
+        marginTop:'40px',
+        [theme.breakpoints.down("sm")]: {
+          /*width:'80%'*/
+        },
+        "@media (max-width:960px)": {
+          marginLeft:'105px',
+          marginTop:'10px'
+        },
+      },
   submit: {
-    background: "#3F51B5",
+    background: "#3293A8",
     borderRadius: "5px",
-    width: "100%",
+    width: "70%",
     height: "50px",
-    margin: theme.spacing(3, 0, 2),
+    
+    margin: theme.spacing(1, 0, 2),
     "&:hover": {
-      background: "rgba(53,68,152,0.79)",
+      background: "rgba(50, 147, 168,0.79)",
     },
+    "@media (max-width:760px)": {
+      width:"80%"
+    },
+  },
+
+  login:{
+    fontWeight:'800',
+    marginLeft:'65px',
+    "@media (max-width:760px)": {
+        
+        marginLeft:'15px'
+      },
+
   },
   textField: {
     margin: "10px 0",
-    borderRadius: "5px",
+    borderRadius: "10px",
+    width: "70%",
+
+   
     borderTopLeftRadius: "10px",
     borderBottomLeftRadius: "10px",
     border: "0px solid #eee",
     borderLeftWidth: "7px",
-    borderLeftColor: "rgba(215,215,215,0.87)",
+    borderLeftColor: "rgba(215,215,215,0.47)",
     "& input": {
       color: "rgba(57,50,50,0.25)",
       border: "0px solid #eee",
-      borderRadius: "30px",
+      height:'25px',
+      borderRadius: "10px",
       width: "100%",
     },
+    "@media (max-width:760px)": {
+      width: "80%",
+    },
   },
-
+  texts:
+  {marginLeft:'-210px',
+  "@media (max-width:760px)": {
+    marginLeft:'-105px',
+  }},
   inputAdornment: {
     background: "rgba(215,215,215,0.87)",
     borderRadius: "7px 0px 0px 7px",
   },
-  loginImg: {
-    borderRadius: "8px",
-    marginTop: "20px",
-    marginLeft: "20px",
-    marginBottom: "-20px",
-  },
-  loginImgHolder: {
-    marginTop: "20px",
-    backgroundColor: "rgba(185,194,226,0.66)",
+  imgHolder: {
+  
+    backgroundColor: "rgba(215,215,215,0.1)",
+    marginLeft:'25px',
     borderRadius: "15px",
     marginBottom: "auto",
     display: "flex",
+    width:"70%",
+    marginTop:'auto',
+    height: "auto",
+    paddingBottom: "50px",
     [theme.breakpoints.down("sm")]: {
       display: "none",
     },
-  },
-  formHolder: {
-    display: "flex",
-    flexDirection: "column",
-    width: "35%",
-    marginTop: 40,
-    [theme.breakpoints.down("sm")]: {
-      width: "100%",
-      marginTop: 10,
-    },
+    width:'40%',
   },
 }));
 
@@ -121,10 +152,21 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
+  const { logIn, googleSignIn } = useUserAuth();
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const historys = useHistory();
   const classes = useStyles();
+  const handleGoogleSignIn = async (e) => {
+    e.preventDefault();
+    try {
+      await googleSignIn();
+      historys.push("/home");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -218,40 +260,48 @@ function Login() {
   return (
     <div className={classes.container}>
       <div className={classes.root}>
-        <div className={classes.loginImgHolder}>
+        <div className={classes.imgHolder}>
           <img
-            src={loginImage}
+            src={SignupImage}
             alt=""
             width="93%"
             height="420px"
-            className={classes.loginImg}
+            style={{
+              borderRadius: "8px",
+              marginTop: "20px",
+              marginLeft: "20px",
+              marginBottom: "-20px",
+            }}
           />
         </div>
 
-        <div className={classes.formHolder}>
-          <Typography
+        <div
+          style={{ display: "flex", flexDirection: "column", heigh: "auto", marginTop:'50px',marginLeft:'-60px' }}
+        >
+          
+          <form className={classes.form} noValidate >
+            <Typography
             align="center"
             component="h1"
             variant="h5"
             style={{ padding: 10 }}
+            className={classes.texts}
           >
             Login
           </Typography>
-          <form className={classes.form} noValidate>
             <TextField
               variant="outlined"
               margin="none"
               required
               fullWidth
               id="email"
+              onChange={onEmailChange}
               label="Email Address"
               name="email"
-              onChange={onEmailChange}
               autoComplete="email"
               autoFocus
               className={classes.textField}
             />
-
             <TextField
               variant="outlined"
               margin="none"
@@ -263,20 +313,25 @@ function Login() {
               type="password"
               id="password"
               autoComplete="current-password"
+             
               className={classes.textField}
             />
-            {/* <FormControlLabel
-                              control={<Checkbox value="remember" color="primary"
-                                                 onChange={this.onCheckboxChange}/>}
-                              label="I have read and agreed to Privacy Policy  & TOU"
-                          />*/}
-            <Box align="right">
-              <Link href="/resetPassword" variant="body2">
+            
+
+           
+            
+            <Typography
+            align="center"
+            
+            variant="body2"
+            style={{ padding: 10 }}
+            className={classes.texts}
+          >
+           <Link href="/resetPassword" variant="body2">
                 Forgot password?
               </Link>
-            </Box>
-            {errorCheck()}
-
+          </Typography>
+            
             <Button
               id="login"
               type="submit"
@@ -288,9 +343,30 @@ function Login() {
             >
               Log in
             </Button>
+            <Typography
+            align="center"
+            
+            variant="body2"
+            style={{ padding: 10 }}
+            className={classes.texts}
+          >
+           Or
+          </Typography>
+            <Button
+              id="login"
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              style={{backgroundColor:'#3F51B5'}}
+              onClick={handleGoogleSignIn}
+            >
+              Sign in with Gmail
+            </Button>
             <div container justify="center">
-              <div item md={6}>
-                <Box mt={4} style={{ fontWeight: "800" }}>
+              <div >
+                <Box  style={{ fontWeight: "800",marginLeft:'60px' }}>
                   Don't have an account?
                   <Link href="/signup" variant="body2" id="gotoSignup">
                     {" Sign Up"}
