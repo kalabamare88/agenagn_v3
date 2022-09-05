@@ -1,340 +1,483 @@
-import React, { useState, useEffect } from "react";
-import {
-  Checkbox,
-  FormControlLabel,
-  withStyles,
-  makeStyles,
-} from "@material-ui/core";
-import CircularProgress from "@mui/material/CircularProgress";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
-import Box from "@material-ui/core/Box";
+import  { useState } from "react";
+import './style.css';
+
+import { useHistory } from "react-router-dom";
+import { Form, Alert } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import "react-phone-number-input/style.css";
+import Paper from '@mui/material/Paper';
+import PhoneInput from "react-phone-number-input";
+import { useUserAuth } from "../../context/UserAuthContext";
+import { Link } from "react-router-dom";
+import {  makeStyles, TextField} from "@material-ui/core";
+import flags from 'react-phone-number-input/flags'
 import Typography from "@material-ui/core/Typography";
-import { useDispatch, useSelector } from "react-redux";
-import { signupUser } from "../../features/auth/authSlice";
 
-import backEndApi from "../../services/api";
-import { Redirect } from "react-router-dom";
-
-const SignupImage = process.env.PUBLIC_URL + "/img/image.png";
+const SignupImage = process.env.PUBLIC_URL + "/img/new.jpg";
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    width: "100%",
-    paddingLeft: "6px",
-    paddingRight: "6px",
-    [theme.breakpoints.down("sm")]: {
-      paddingLeft: 5,
-      paddingRight: 5,
-    },
-  },
-  root: {
-    display: "flex",
-    justifyContent: "space-around",
-    flexWrap: "nowrap",
-    background: "#eeeeee",
-    borderRadius: "15px",
-    height: "600px",
-    padding: 10,
-    "& a": {
-      color: "#3A6351",
-    },
-
-    [theme.breakpoints.down("sm")]: {
-      "& form": {
-        padding: 0,
+      display:'flex',
+      justifyContent:'center',
+      
+      width: "100%",
+      paddingLeft: "6px",
+      paddingRight: "6px",
+      [theme.breakpoints.down("sm")]: {
+        paddingLeft: 5,
+        paddingRight: 5,
       },
     },
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: "40vh",
-    width: "100%",
-    [theme.breakpoints.down("sm")]: {
-      /*width:'80%'*/
+    root: {
+      
+       
+      
+      display: "flex",
+      width:'80%',
+      border: "1px solid rgba(0, 0, 0, .2)",
+      justifyContent:'space-around',
+      flexWrap: "nowrap",
+      background: "white",
+      borderRadius: "15px",
+      height: "650px",
+      padding: 10,
+      "& a": {
+        color: "#3A6351",
+      },
+      
+  
+      [theme.breakpoints.down("sm")]: {
+        "& form": {
+          padding: 0,
+        },
+      },
     },
-  },
-  submit: {
-    background: "#3F51B5",
-    borderRadius: "5px",
-    width: "100%",
-    height: "50px",
-    margin: theme.spacing(3, 0, 2),
-    "&:hover": {
-      background: "rgba(53,68,152,0.79)",
+    avatar: {
+      margin: theme.spacing(1),
+      backgroundColor: theme.palette.secondary.main,
     },
-  },
-  textField: {
-    margin: "10px 0",
-    borderRadius: "5px",
-    borderTopLeftRadius: "10px",
-    borderBottomLeftRadius: "10px",
+    
+    form: {
+      marginLeft:'205px',
+      width: "90%",
+      marginTop:'40px',
+      [theme.breakpoints.down("sm")]: {
+        /*width:'80%'*/
+      },
+      "@media (max-width:960px)": {
+        marginLeft:'55px',
+        marginTop:'10px'
+      },
+    },
+
+login:{
+  fontWeight:'800',
+  marginLeft:'65px',
+  "@media (max-width:760px)": {
+      
+      marginLeft:'15px'
+    },
+
+},
+phoneinput:{
+  width: "70%",
+  marginLeft:'auto',
+  marginRight:'auto',
+  
+  padding:'20px',
+  "@media (max-width:750px)": {
+    width: "15rem",
+   
+    
+  }
+},
+passwordinput:{
+  width: "52%",
+  display:'flex',
+  justifyContent:'center',
+  border:'5px solid red',
+  marginLeft:'120px',
+  marginRight:'auto',
+  border: "1px solid rgba(0, 0, 0, .2)",
+     
+  background: "white",
+  borderRadius: "7px",
+  height: "40px",
+  "@media (max-width:980px)": {
+    paddingLeft: "20px",
+    paddingRight: "25px",
+    display:'block',
+  }
+
+},
+otpinput:{
+  width: "52%",
+  display:'flex',
+  justifyContent:'center',
+ 
+  
+  marginTop:'20px',
+  marginBottom:'20px',
+  border: "1px solid rgba(0, 0, 0, .2)",
+     
+  background: "white",
+  borderRadius: "7px",
+  height: "40px",
+
+},
+textField: {
+ 
+  border: "0px solid #eee",
+  borderLeftWidth: "7px",
+  borderLeftColor: "rgba(215,215,215,0.47)",
+  "& input": {
+    color: "rgba(57,50,50,0.25)",
     border: "0px solid #eee",
-    borderLeftWidth: "7px",
-    borderLeftColor: "rgba(215,215,215,0.87)",
-    "& input": {
-      color: "rgba(57,50,50,0.25)",
-      border: "0px solid #eee",
-      borderRadius: "30px",
-      width: "100%",
-    },
+    height:'25px',
+    borderRadius: "10px",
+    width: "10%",
   },
-  inputAdornment: {
-    background: "rgba(215,215,215,0.87)",
-    borderRadius: "7px 0px 0px 7px",
+  "@media (max-width:760px)": {
+    width: "80%",
   },
-  imgHolder: {
+},
+texts:
+{marginLeft:'20px',
+"@media (max-width:760px)": {
+  marginLeft:'-105px',
+}},
+inputAdornment: {
+  background: "rgba(215,215,215,0.87)",
+  borderRadius: "7px 0px 0px 7px",
+},
+authentication:{
+  
+  flexDirection:'column',
+  alignItems:'center',
+  justifyContent:'center',
+ 
+  borderRadius: "15px",
+  
+  marginLeft:'25px',
+  borderRadius: "15px",
+  marginBottom: "auto",
+  
+  width:"50%",
+  marginTop:'auto',
+  height: "auto",
+ 
+  "@media (max-width:960px)": {
+    width: "80%",
+  },
+},
+
+phoneauth:{
+  
+  flexDirection:'column',
+  alignItems:'center',
+  justifyContent:'center',
+ 
+  borderRadius: "15px",
+  
+  marginLeft:'25px',
+  borderRadius: "15px",
+  marginBottom: "auto",
+  
+  
+  marginTop:'auto',
+  height: "auto",
+  paddingBottom: "11px",
+  "@media (max-width:960px)": {
+    width: "80%",
+  },
+},
+PhoneInputInput:{
+  flex: "1 1",
+  
+  height: "30px",
+  borderRadius: "5px",
+  border: "1px solid red",
+  
+},
+email:{
+  background: "#3F51B5",
+  color:'white',
+  borderRadius: "5px",
+  width: "57%",
+  height: "47px",
+  border: "1px solid white",
+  
+  margin: theme.spacing(1, 0, 2),
+  "&:hover": {
+    background: "rgba(	63, 81, 181,0.79)",
+  }, 
+  marginLeft:'40px',
+  "@media (max-width:760px)": {
+    width:"80%"
+  },
+},
+buttons: {
+  display: "flex",
+  flexDirection:'column',
+  justifyContent: "center",
+  alignItems: "center",
+
+},
+
+buttonss: {
+  display: "flex",
+
+  justifyContent: "center",
+  alignItems: "center",
+
+},
+buttonone: {
+  paddingLeft: "20px",
+  paddingRight: "20px",
+  background: "#3293A8",
+  paddingTop: "13px",
+  border:'0.5px solid white',
+  paddingBottom: "13px",
+  borderRadius: "5px",
+  marginLeft: "35px",
+  marginTop: "25px",
+  marginBottom: "25px",
+  color: "#fff",
+  textTransform: "none",
+  width:'53%',
+
+  "@media (max-width:980px)": {
+    paddingLeft: "50px",
+    paddingRight: "50px",
+    display:'block',
+  },
+  textsField:{
+    width:'100%',
+    
+    marginLeft:"1000px",
+   
+  },
+  text:{
+    marginLeft: "400px",
+    textAlign:'center',
+  }
+  ,
+  inputsContainer: {
+    marginLeft: "400px",
+    width:'100%',
+  },
+  input: {
     marginTop: "20px",
-    backgroundColor: "rgba(223,225,232,0.66)",
-    borderRadius: "15px",
-    marginBottom: "auto",
-    display: "flex",
-    height: "auto",
-    paddingBottom: "50px",
-    [theme.breakpoints.down("sm")]: {
-      display: "none",
-    },
+    marginBottom: "20px",
+  width: "100%",
+  height: "40px",
+  border: "5px solid rgba(0, 0, 0, .5)",
+  justifyContent:'space-around',
+  borderRadius: "5px",
+  marginLeft:'450px',
+  
+  padding: 15,
+    background: "white",
+    borderRadius: "7px",
   },
+  otpinput:{ 
+  
+    marginBottom: "20px",
+    width: "100%",
+    height: "40px",
+    border: "5px solid rgba(0, 0, 0, .5)",
+    justifyContent:'space-around',
+
+    borderRadius: "5px",
+
+    padding: 15,
+  background: "white",
+  borderRadius: "7px",},
+  recaptha:{
+    marginLeft:'450px',
+  },
+  "&:hover": {
+    color: "black",
+    cursor: "pointer",
+    color: "rgba(215,215,215,0.9)",
+  },
+},
+buttontwo: {
+ 
+  paddingLeft: "20px",
+  paddingRight: "20px",
+  background: "#3293A8",
+  paddingTop: "8px",
+  paddingBottom: "8px",
+  borderRadius: "5px",
+  marginLeft: "15px",
+  marginTop: "15px",
+  color: "#fff",
+  textTransform: "none",
+  width:'75%',
+  "@media (max-width:980px)": {
+    paddingLeft: "20px",
+    paddingRight: "25px",
+    display:'block',
+  },},
+  buttonverify: {
+ 
+    paddingLeft: "27px",
+    paddingRight: "36px",
+    background: "#3293A8",
+    paddingTop: "8px",
+    paddingBottom: "8px",
+    borderRadius:'5px',
+    border: "5px",
+    marginLeft: "15px",
+    marginTop: "15px",
+    color: "#fff",
+    textTransform: "none",
+    width:'75%',
+    "@media (max-width:980px)": {
+      paddingLeft: "20px",
+      paddingRight: "25px",
+      display:'block',
+    },
+  recaptha:{
+    marginLeft:'450px',
+  },
+  "&:hover": {
+    color: "black",
+    cursor: "pointer",
+    color: "rgba(215,215,215,0.9)",
+  },
+},
+imgHolder: {
+
+  backgroundColor: "rgba(215,215,215,0.1)",
+  marginLeft:'25px',
+  borderRadius: "15px",
+  marginBottom: "auto",
+  display: "flex",
+  width:"70%",
+  marginTop:'auto',
+  height: "auto",
+  paddingBottom: "50px",
+  [theme.breakpoints.down("sm")]: {
+    display: "none",
+  },
+},
 }));
-
-function Signup() {
-  const [state, setState] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    isCheck: false,
-    errorMessage: "",
-    successMessage: "",
-    redirect: false,
-  });
-  const dispatch = useDispatch();
-  const {
-    registerData,
-    isRegisterFetching,
-    isRegisterSuccess,
-    isRegisterError,
-  } = useSelector((state) => state.auth);
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const SignUpPhone = () => {
+  const [error, setError] = useState("");
+  const [number, setNumber] = useState("");
+  const [flag, setFlag] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [result, setResult] = useState("");
+  const { setUpRecaptha } = useUserAuth();
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isCheck, setIsCheck] = useState("");
+  const { logIn, googleSignIn } = useUserAuth();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [redirect, setRedirect] = useState("");
 
-  const classes = useStyles();
+  const historys = useHistory();
+  
 
-  const onFormSubmit = (e) => {
+  const getOtp = async (e) => {
     e.preventDefault();
-    // setState({ errorMessage: "" });
-    // setState({ successMessage: "" });
-    setErrorMessage("");
-    setSuccessMessage("");
-
-    validateInput();
-  };
-  const signUpApiRequest = (signUpDetails) => {
-    dispatch(signupUser(signUpDetails));
-    // const { registerData } = await backEndApi.post("/signUpUser", signUpDetails);
-    if (registerData === "userExist") {
-      setErrorMessage("The email that you have provided is already in use.");
-    } else {
-      // setState({
-      //   redirect: true,
-      //   errorMessage: "",
-      //   successMessage: "You have successfully  Signed Up.",
-      // });
-      setRedirect(true);
-      setErrorMessage("");
-      setSuccessMessage("You have successfully  Signed Up.");
+    console.log(number);
+    setError("");
+    if (number === "" || number === undefined)
+      return setError("Please enter a valid phone number!");
+    try {
+      const response = await setUpRecaptha(number);
+      setResult(response);
+      setFlag(true);
+    } catch (err) {
+      setError(err.message);
     }
-  };
-  const validateInput = () => {
-    const signUpUser = {
-      name: name,
-      email: email,
-      password: password,
-      confirmPassword: confirmPassword,
-    };
-
-    var mailFormat =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
-    if (name && email && password && confirmPassword) {
-      if (password !== confirmPassword) {
-        // setState({
-        //   errorMessage: "The passwords that you have entered does not match.",
-        // });
-        setErrorMessage("The passwords that you have entered does not match.");
-      } else if (password.length < 6) {
-        // setState({
-        //   errorMessage: "Password should be more than 6 characters",
-        // });
-        setErrorMessage("Password should be more than 6 characters");
-      } else if (!mailFormat.test(email)) {
-        // setState({
-        //   errorMessage: "The email that you have provided is invalid.",
-        // });
-        setErrorMessage("The email that you have provided is invalid.");
-      } else if (!isCheck) {
-        // setState({
-        //   errorMessage:
-        //     "You have to agree to the Privacy Policy and Terms Of Use.",
-        // });
-        setErrorMessage(
-          "You have to agree to the Privacy Policy and Terms Of Use."
-        );
-      } else {
-        if (errorMessage === "") {
-          signUpApiRequest(signUpUser);
-          /*/!*axios.post('http://localhost:5000/signUpUser', signupUser)*!/
-                    axios.post('https://damp-fjord-23317.herokuapp.com/signUpUser', signUpUser)
-                        .then(res => {
-
-                            }
-                        )*/
-        }
-      }
-    } else {
-      // setState({ errorMessage: "Please fill all the inputs." });
-      setErrorMessage("Please fill all the inputs.");
-    }
-  };
-  const onNameChange = (e) => {
-    // setState({ name: e.target.value });
-    setName(e.target.value);
-  };
-  const onEmailChange = (e) => {
-    // setState({ email: e.target.value });
-    setEmail(e.target.value);
   };
   const onPasswordChange = (e) => {
     // setState({ password: e.target.value });
     setPassword(e.target.value);
   };
-  const onConfirmPasswordChange = (e) => {
-    // setState({ confirmPassword: e.target.value });
-    setConfirmPassword(e.target.value);
-  };
-  const onCheckboxChange = (e) => {
-    if (
-      e.target.checked &&
-      errorMessage === "You Have to accept the Terms & PP"
-    ) {
-      // setState({ errorMessage: "" });
-      setErrorMessage("");
-    }
-    // setState({ isCheck: e.target.checked });
-    setIsCheck(e.target.checked);
-  };
-  const errorCheck = () => {
-    if (errorMessage) {
-      return (
-        <Typography
-          variant="h6"
-          style={{
-            color: "red",
-            marginLeft: "5px",
-            fontSize: "14px",
-          }}
-        >
-          {errorMessage}
-        </Typography>
-      );
-    } else {
-      return (
-        <Typography variant="body2" style={{ color: "red", display: "none" }}>
-          ''
-        </Typography>
-      );
+  const classes = useStyles();
+  const verifyOtp = async (e) => {
+    
+    e.preventDefault();
+    setError("");
+    if (otp === "" || otp === null) return;
+    try {
+      await result.confirm(otp);
+      console.log('yes')
+      historys.push('/login')
+    } catch (err) {
+      setError(err.message);
     }
   };
-  const successCheck = () => {
-    if (successMessage) {
-      return (
-        <Typography variant="h6" style={{ color: "green", marginLeft: "5px" }}>
-          {successMessage}
-        </Typography>
-      );
-    } else {
-      return (
-        <Typography variant="body2" style={{ color: "red", display: "none" }}>
-          ''
-        </Typography>
-      );
+  const handleGoogleSignIn = async (e) => {
+    e.preventDefault();
+    try {
+      await googleSignIn();
+      historys.push("/home");
+    } catch (error) {
+      console.log(error.message);
     }
   };
-  if (redirect) {
-    return <Redirect to="/login" />;
-  }
+
   return (
     <div className={classes.container}>
       <div className={classes.root}>
-        <div className={classes.imgHolder}>
+      <div className={classes.imgHolder}>
           <img
             src={SignupImage}
             alt=""
             width="93%"
             height="420px"
             style={{
-              borderRadius: "8px",
+              borderRadius: "20px",
               marginTop: "20px",
               marginLeft: "20px",
               marginBottom: "-20px",
             }}
           />
-        </div>
-
-        <div
-          style={{ display: "flex", flexDirection: "column", heigh: "auto" }}
-        >
+      </div> 
+      <div className={classes.authentication}>
+      <Paper elevation={0} sx={{ borderRadius: '15px', backgroundColor: "#eeeeee70 ",marginBottom: "10px",}}>
+          <div className={classes.phoneauth}>
           <Typography
-            align="center"
-            component="h1"
-            variant="h5"
-            style={{ padding: 10 }}
-          >
-            Sign Up
-          </Typography>
-          <form className={classes.form} noValidate onSubmit={onFormSubmit}>
-            <TextField
-              variant="outlined"
-              margin="none"
-              required
-              fullWidth
-              id="name"
-              onChange={onNameChange}
-              label="Name"
-              name="name"
-              autoFocus
-              className={classes.textField}
+              align="center"
+              component="h3"
+              variant="h4"
+              className={classes.texts}
+              
+            >
+                  Sign Up
+            
+            </Typography>
+        {error && <Alert variant="danger">{error}</Alert>}
+        
+        <Form onSubmit={getOtp} style={{ display: !flag ? "block" : "none" }}>
+          <Form.Group className="mb-4" controlId="formBasicEmail">
+          
+            <PhoneInput
+              flags={flags}
+              className={classes.phoneinput}
+              defaultCountry="ET"
+              value={number}
+              onChange={setNumber}
+              placeholder="Enter Phone Number"
+              inputProps={{
+                name: 'phone',
+                country:'us',
+                required: true,
+                autoFocus: true
+              }}
+              
+            
+             containerStyle={{margin:'20px'}}
+    
+                dropdownStyle={{height:'50px'}}
             />
-            <TextField
+            {/* <TextField
               variant="outlined"
-              margin="none"
-              required
-              fullWidth
-              id="email"
-              onChange={onEmailChange}
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              className={classes.textField}
-            />
-            <TextField
-              variant="outlined"
+              id="outlined-name"
               margin="none"
               required
               fullWidth
@@ -342,71 +485,100 @@ function Signup() {
               onChange={onPasswordChange}
               label="Password"
               type="password"
-              id="password"
+             
               autoComplete="current-password"
               inputProps={{
-                minLength: 8,
+                minLength: 6,
               }}
-              className={classes.textField}
-            />
-            <TextField
-              variant="outlined"
-              margin="none"
-              required
-              fullWidth
-              onChange={onConfirmPasswordChange}
-              label="Confirm Password"
-              name="confirmPassword"
-              type="password"
-              id="password"
-              className={classes.textField}
-            />
-
-            <FormControlLabel
-              id="check"
-              control={
-                <Checkbox
-                  value="remember"
-                  color="primary"
-                  onChange={onCheckboxChange}
-                />
-              }
-              label="I have read and agreed to Privacy Policy  & TOU"
-            />
-
-            {errorMessage ? errorCheck() : successCheck()}
-
-            <Button
-              id="SignUp"
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
-              {isRegisterFetching ? (
-                <Box sx={{ display: "flex" }}>
-                  <CircularProgress style={{ color: "#fff" }} />
-                </Box>
-              ) : (
-                "Sign Up"
-              )}
-            </Button>
-            <div>
-              <div>
-                <Box mt={4} style={{ fontWeight: "800" }}>
-                  Already have an account
-                  <Link href="/login" variant="body2" id="goToLogin">
-                    {" Log in"}
-                  </Link>
-                </Box>
-              </div>
+              className={classes.textsField}
+            /> */}
+            <div className={classes.inputsContainer}>
+                <input
+                      name="SquareMeter"
+                      type="password"
+                     
+                      placeholder="Enter Your password here"
+                      className={classes.passwordinput}
+                      onChange={onPasswordChange}
+                    />
             </div>
-          </form>
-        </div>
+            
+            <div id="recaptcha-container"   style={{
+              borderRadius: "8px",
+              paddingTop: "20px",
+              paddingLeft: "70px",
+             
+            }}></div>
+          </Form.Group>
+          <div className="button-right">
+            <Link></Link>
+          </div>
+          <div className={classes.buttons}>
+          
+            <Button type="submit" variant="primary"  className= {classes.buttonone}>
+              continue with phone-number
+            </Button>
+          </div>
+        </Form>
+
+
+        <Form onSubmit={verifyOtp} style={{ display: flag ? "flex" : "none", flexDirection:'column', alignItems:'center' }}>
+          
+            <input
+              type="otp"
+            
+              className={classes.otpinput}
+              placeholder="Enter OTP"
+              onChange={(e) => setOtp(e.target.value)}
+            />
+        
+          <div className={classes.buttonss}>
+            <Link to="/">
+              <Button variant="primary"
+              className={classes.buttonverify}
+              >Cancel</Button>
+            </Link>
+          
+            <Button type="submit" variant="primary" className={classes.buttonverify}>
+              Verify
+            </Button>
+          </div>
+        </Form>
+          </div>
+        </Paper>
+          
+
+          <div className={classes.buttons}>
+          <Typography
+              align="center"
+              component="h1"
+              variant="h6"
+              className={classes.texts}
+              
+            >
+                  Or 
+            
+            </Typography>
+            <Button
+                id="SignUp"
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.email}
+                onClick={handleGoogleSignIn}
+              >
+                Sign up with email
+                
+              </Button>
+          </div>
       </div>
+      
+      </div>
+      
+
     </div>
   );
-}
+};
 
-export default Signup;
+export default SignUpPhone;
