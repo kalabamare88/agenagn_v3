@@ -54,12 +54,17 @@ const useStyles = makeStyles((theme) => ({
       "& form": {
         padding: "0px",
       },
+     
     },
   },
   firstGrid: {
     background: "white",
     boxShadow: "-9px 18px 16px rgba(.50, .5, .5, 0.05)",
     borderRadius: "5px",
+    "@media (max-width:600px)": {
+        
+      padding: "10px",
+    },
   },
 
   input: {
@@ -67,13 +72,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "5px",
     width: "100%",
     height: "40px",
-    borderRadius: "5px",
-    border: "0.5px solid #9e9e9e",
-    background: "#EEEEEE",
-    "&::-webkit-input-placeholder": {
-      color: "rgba(57,50,50,0.3)",
-    },
-
+   
     "&::-moz-placeholder": {
       /* Firefox 19+ */ color: "rgba(57,50,50,0.3)",
     },
@@ -90,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
   addhouseimage: {
     position: "absolute",
     top: 320,
-    left: 70,
+    left: 160,
     width: 400,
     "@media (max-width:1220px)": {
       left: 45,
@@ -122,7 +121,7 @@ const useStyles = makeStyles((theme) => ({
   textarea: {
     padding: "10px",
     resize: "none",
-    width: "130%",
+    width: "115%",
     background: "#EEEEEE",
     border: "0.5px solid #9e9e9e",
     borderRadius: "5px",
@@ -142,11 +141,11 @@ const useStyles = makeStyles((theme) => ({
       /* Firefox 18- */ color: "rgba(57,50,50,0.3)",
     },
     "@media (max-width:960px)": {
-      width: "100%",
+      width: "80%",
     },
   },
   inputsContainer: {
-    margin: "30px",
+    marginTop: "40px",
   },
   buttons: {
     display: "flex",
@@ -157,8 +156,8 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonone: {
     width: "100%",
-    paddingLeft: "40px",
-    paddingRight: "40px",
+    paddingLeft: "30px",
+    paddingRight: "30px",
     background: "#3293A8",
     paddingTop: "10px",
     paddingBottom: "10px",
@@ -167,6 +166,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
     textTransform: "none",
     marginBottom: "15px",
+    marginTop: "25px",
 
     "@media (max-width:980px)": {
       padding: "13px",
@@ -609,6 +609,7 @@ function NewListing({ setSideBar }) {
                   value="Pending"
                   variant="contained"
                   className={classes.buttonone}
+                  // style={{paddingRight:"500px"}}
                 >
                   Submit For Review
                 </Button>

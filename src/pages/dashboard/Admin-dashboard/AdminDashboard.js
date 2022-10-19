@@ -11,8 +11,9 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import moment from "moment";
 import backEndApi from "../../../services/api";
-import Pagination from "@material-ui/lab/Pagination";
-import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
+import { Pagination } from "@mui/material";
+
+// import fas-fa home from "@mui/icons-material/AddCircleOutlined";
 import { Redirect, Link } from "react-router-dom";
 import usePagination from "../Pagination";
 import useStyles from "./AdminStyle";
@@ -132,7 +133,7 @@ function AdminDashboard(props) {
                       fontWeight: "bold",
                     }}
                     startIcon={
-                      <AddCircleOutlinedIcon
+                      <fas-fa home
                         style={{ color: "#58D1BB", fontSize: "2rem" }}
                       />
                     }

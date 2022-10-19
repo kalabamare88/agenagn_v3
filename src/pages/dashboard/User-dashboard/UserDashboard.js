@@ -6,18 +6,24 @@ import {
   IconButton,
   Popover,
   Divider,
+  Card,
+  CardActionArea,
+  CardActions,
+  CardContent,
 } from "@material-ui/core";
+
 import { Link } from "react-router-dom";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
+
+
+
+// import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import backEndApi from "../../../services/api";
 import AccountInfo from "./AccountInfo";
 import Loader from "./Loader";
 import ViewLaunchOnHover from "./ViewLaunchOnHover";
 import ReviewStatusFilter from "../ReviewStatusFilter";
-import Pagination from "@material-ui/lab/Pagination";
+import { Pagination } from "@mui/material";
+
 import useStyles from "./UserStyle";
 import ListingStatusFilter from "./ListingStatusFilter";
 import usePagination from "../Pagination";
@@ -114,6 +120,7 @@ function UserDashboard(props) {
           <Grid item xs={4} className={classes.gridElement}>
             {row.location}
           </Grid>
+            
 
           <Grid
             item
@@ -126,6 +133,7 @@ function UserDashboard(props) {
           >
             {ListingStatusFilter(row.listingStatus, row._id)}
           </Grid>
+            <br />
 
           <Grid
             item
@@ -137,6 +145,8 @@ function UserDashboard(props) {
           >
             {ReviewStatusFilter(row.reviewStatus)}
           </Grid>
+
+          <br />
           <Grid
             item
             xs={2}
@@ -159,13 +169,15 @@ function UserDashboard(props) {
               }}
               size="large"
               // href={"/editHouse/" + row._id}
-            >
-              <MoreVertIcon
-                onClick={handleClick}
+            > 
+
+              <i 
+              class="fas fa-home" 
+              onClick={handleClick}
                 fontSize="inherit"
-                style={{ fontSize: "1.25rem", height: "100% " }}
-                className={classes.editIcon}
-              />
+               
+              ></i>
+              
               <Popover
                 anchorOrigin={{
                   vertical: "0",
@@ -225,9 +237,7 @@ function UserDashboard(props) {
                       variant="outlined"
                       className={classes.popover}
                       startIcon={
-                        <EditIcon
-                          style={{ color: "#58D1BB", fontSize: "1rem" }}
-                        />
+                        <i class="fas fa-home" style={{fontSize:'20px'}}></i>
                       }
                     >
                       Edit
@@ -258,9 +268,7 @@ function UserDashboard(props) {
                         width: "100%",
                       }}
                       startIcon={
-                        <DeleteIcon
-                          style={{ color: "#F24545", fontSize: "1rem" }}
-                        />
+                        <i class="fas fa-home" style={{fontSize:'20px'}}></i>
                       }
                     >
                       Delete
@@ -330,9 +338,7 @@ function UserDashboard(props) {
                     fontWeight: "bold",
                   }}
                   startIcon={
-                    <AddCircleOutlinedIcon
-                      style={{ color: "#58D1BB", fontSize: "2rem" }}
-                    />
+                    <i class="fas fa-home" style={{fontSize:'20px'}}></i>
                   }
                 >
                   Add new house

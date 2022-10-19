@@ -1,6 +1,6 @@
 import  { useState } from "react";
 import './style.css';
-import InputAdornment from "@mui/material/InputAdornment";
+
 import { useHistory } from "react-router-dom";
 import { Form, Alert } from "react-bootstrap";
 import { Button } from "react-bootstrap";
@@ -12,18 +12,17 @@ import { Link } from "react-router-dom";
 import {  makeStyles, TextField} from "@material-ui/core";
 import flags from 'react-phone-number-input/flags'
 import Typography from "@material-ui/core/Typography";
-import backEndApi from '../../services/api'
+
 const SignupImage = process.env.PUBLIC_URL + "/img/new.jpg";
 
 const useStyles = makeStyles((theme) => ({
   container: {
       display:'flex',
       justifyContent:'center',
-      background: "#EEEEEE",
-
+      
       width: "100%",
-      paddingLeft: "60px",
-      paddingRight: "60px",
+      paddingLeft: "6px",
+      paddingRight: "6px",
       [theme.breakpoints.down("sm")]: {
         paddingLeft: 5,
         paddingRight: 5,
@@ -34,13 +33,13 @@ const useStyles = makeStyles((theme) => ({
        
       
       display: "flex",
-      width:'83%',
-      border: "0px solid rgba(0, 0, 0, .2)",
+      width:'80%',
+      border: "1px solid rgba(0, 0, 0, .2)",
       justifyContent:'space-around',
       flexWrap: "nowrap",
       background: "white",
-      borderRadius: "17px",
-      height: "600px",
+      borderRadius: "15px",
+      height: "650px",
       padding: 10,
       "& a": {
         color: "#3A6351",
@@ -86,53 +85,21 @@ phoneinput:{
   marginRight:'auto',
   
   padding:'20px',
-  "@media (max-width:874px)": {
-    width: "90%",
-   
-    
-  },
-  "@media (max-width:563px)": {
-    
-    width: "120%",
-    
-  }
 },
 passwordinput:{
-  width: "52%",
+  width: "60%",
   display:'flex',
   justifyContent:'center',
   border:'5px solid red',
-  marginLeft:'120px',
+  marginLeft:'100px',
   marginRight:'auto',
+  paddingTop:'9px',
+  paddingBottom:'9px',
   border: "1px solid rgba(0, 0, 0, .2)",
      
   background: "white",
   borderRadius: "7px",
-  height: "40px",
-  "@media (max-width:980px)": {
-    paddingLeft: "20px",
-    paddingRight: "25px",
-    display:'block',
-  },
-  "@media (max-width:880px)": {
-    marginLeft:'77px',
-    width: "72%",
-  },
-
-},
-otpinput:{
-  width: "52%",
-  display:'flex',
-  justifyContent:'center',
- 
-  
-  marginTop:'20px',
-  marginBottom:'20px',
-  border: "1px solid rgba(0, 0, 0, .2)",
-     
-  background: "white",
-  borderRadius: "7px",
-  height: "40px",
+  height: "45px",
 
 },
 textField: {
@@ -215,7 +182,6 @@ email:{
   borderRadius: "5px",
   width: "57%",
   height: "47px",
-  border: "1px solid white",
   
   margin: theme.spacing(1, 0, 2),
   "&:hover": {
@@ -246,15 +212,15 @@ buttonone: {
   paddingRight: "20px",
   background: "#3293A8",
   paddingTop: "13px",
-  border:'0.5px solid white',
+  border:'0.5px solid black',
   paddingBottom: "13px",
   borderRadius: "5px",
-  marginLeft: "35px",
+  marginLeft: "20px",
   marginTop: "25px",
-  marginBottom: "25px",
+  marginBottom: "15px",
   color: "#fff",
   textTransform: "none",
-  width:'53%',
+  width:'60%',
 
   "@media (max-width:980px)": {
     paddingLeft: "50px",
@@ -283,26 +249,13 @@ buttonone: {
   height: "40px",
   border: "5px solid rgba(0, 0, 0, .5)",
   justifyContent:'space-around',
+ 
   borderRadius: "5px",
-  marginLeft:'450px',
   
   padding: 15,
     background: "white",
     borderRadius: "7px",
   },
-  otpinput:{ 
-  
-    marginBottom: "20px",
-    width: "100%",
-    height: "40px",
-    border: "5px solid rgba(0, 0, 0, .5)",
-    justifyContent:'space-around',
-
-    borderRadius: "5px",
-
-    padding: 15,
-  background: "white",
-  borderRadius: "7px",},
   recaptha:{
     marginLeft:'450px',
   },
@@ -329,26 +282,7 @@ buttontwo: {
     paddingLeft: "20px",
     paddingRight: "25px",
     display:'block',
-  },},
-  buttonverify: {
- 
-    paddingLeft: "27px",
-    paddingRight: "36px",
-    background: "#3293A8",
-    paddingTop: "8px",
-    paddingBottom: "8px",
-    borderRadius:'5px',
-    border: "5px",
-    marginLeft: "15px",
-    marginTop: "15px",
-    color: "#fff",
-    textTransform: "none",
-    width:'75%',
-    "@media (max-width:980px)": {
-      paddingLeft: "20px",
-      paddingRight: "25px",
-      display:'block',
-    },
+  },
   recaptha:{
     marginLeft:'450px',
   },
@@ -358,22 +292,6 @@ buttontwo: {
     color: "rgba(215,215,215,0.9)",
   },
 },
-inputs: {
-    padding: "10px",
-    marginTop: "5px",
-    width: "100%",
-    height: "40px",
-   
-    "&::-moz-placeholder": {
-      /* Firefox 19+ */ color: "rgba(57,50,50,0.3)",
-    },
-    "&:-ms-input-placeholder": {
-      /* IE 10+ */ color: "rgba(57,50,50,0.3)",
-    },
-    "&:-moz-placeholder": {
-      /* Firefox 18- */ color: "rgba(57,50,50,0.3)",
-    },
-  },
 imgHolder: {
 
   backgroundColor: "rgba(215,215,215,0.1)",
@@ -401,13 +319,14 @@ const SignUpPhone = () => {
   const { logIn, googleSignIn } = useUserAuth();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
   const historys = useHistory();
-const getOtp = async (e) => {
+  
+
+  const getOtp = async (e) => {
     e.preventDefault();
     console.log(number);
-
     setError("");
-    this.validateInput();
     if (number === "" || number === undefined)
       return setError("Please enter a valid phone number!");
     try {
@@ -417,52 +336,7 @@ const getOtp = async (e) => {
     } catch (err) {
       setError(err.message);
     }
-
   };
-
-  // backend
- const signUpApiRequest = async (signUpDetails) => {
-    const {data} = await backEndApi.post('/signUpUser', signUpDetails);
-    if (data === "userExist") {
-        this.setState({errorMessage: "The email that you have provided is already in use."})
-    } else {
-        this.setState({
-            redirect: true,
-            errorMessage: '',
-            successMessage: 'You have successfully  Signed Up.'
-        });
-
-
-    }
-};
-
-const validateInput = () => {
-    const signUpUser = {
-        
-        phoneNumber: this.state.phoneNumber,
-        password: this.state.password,
-        
-    };
-if (this.state.phoneNumber && this.state.password ) {
-        if (this.state.password.length<6){
-            this.setState({errorMessage: "Password should be more than 6 characters"})
-        }
-         {
-            if (this.state.errorMessage === '') {
-                this.signUpApiRequest(signUpUser)
-                /*/!*axios.post('http://localhost:5000/signUpUser', signupUser)*!/
-                axios.post('https://damp-fjord-23317.herokuapp.com/signUpUser', signUpUser)
-                    .then(res => {
-                        }
-                    )*/
-            }
-        }
-    } else {
-        this.setState({errorMessage: "Please fill all the inputs."})
-    }
-
-
-};
   const onPasswordChange = (e) => {
     // setState({ password: e.target.value });
     setPassword(e.target.value);
@@ -476,9 +350,6 @@ if (this.state.phoneNumber && this.state.password ) {
     try {
       await result.confirm(otp);
       console.log('yes')
-
-
-
       historys.push('/login')
     } catch (err) {
       setError(err.message);
@@ -488,8 +359,7 @@ if (this.state.phoneNumber && this.state.password ) {
     e.preventDefault();
     try {
       await googleSignIn();
-      console.log('helow it works');
-      historys.push("/dashboard");
+      historys.push("/home");
     } catch (error) {
       console.log(error.message);
     }
@@ -505,7 +375,7 @@ if (this.state.phoneNumber && this.state.password ) {
             width="93%"
             height="420px"
             style={{
-              borderRadius: "20px",
+              borderRadius: "8px",
               marginTop: "20px",
               marginLeft: "20px",
               marginBottom: "-20px",
@@ -513,7 +383,7 @@ if (this.state.phoneNumber && this.state.password ) {
           />
       </div> 
       <div className={classes.authentication}>
-      <Paper elevation={0} sx={{ borderRadius: '15px', backgroundColor: "#eeeeee70 ",marginBottom: "10px",}}>
+      <Paper elevation={0} sx={{ borderRadius: '15px', border:'3px solid black' }}>
           <div className={classes.phoneauth}>
           <Typography
               align="center"
@@ -528,7 +398,7 @@ if (this.state.phoneNumber && this.state.password ) {
         {error && <Alert variant="danger">{error}</Alert>}
         
         <Form onSubmit={getOtp} style={{ display: !flag ? "block" : "none" }}>
-          <Form.Group className="mb-4" controlId="formBasicmail">
+          <Form.Group className="mb-4" controlId="formBasicEmail">
           
             <PhoneInput
               flags={flags}
@@ -550,19 +420,22 @@ if (this.state.phoneNumber && this.state.password ) {
                 dropdownStyle={{height:'50px'}}
             />
             {/* <TextField
-                  label="Phone number"
-                  name="phone"
-                  
-                  // onChange={onPhoneNumberChanged}
-                  // value={phoneNumber}
-                  placeholder="eg, 925762589"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">+251</InputAdornment>
-                    ),
-                   
-                  }}
-                /> */}
+              variant="outlined"
+              id="outlined-name"
+              margin="none"
+              required
+              fullWidth
+              name="password"
+              onChange={onPasswordChange}
+              label="Password"
+              type="password"
+             
+              autoComplete="current-password"
+              inputProps={{
+                minLength: 6,
+              }}
+              className={classes.textsField}
+            /> */}
             <div className={classes.inputsContainer}>
                 <input
                       name="SquareMeter"
@@ -574,12 +447,7 @@ if (this.state.phoneNumber && this.state.password ) {
                     />
             </div>
             
-            <div id="recaptcha-container"   style={{
-              borderRadius: "8px",
-              paddingTop: "20px",
-              paddingLeft: "70px",
-             
-            }}></div>
+            <div id="recaptcha-container" className={classes.recaptha}></div>
           </Form.Group>
           <div className="button-right">
             <Link></Link>
@@ -587,18 +455,18 @@ if (this.state.phoneNumber && this.state.password ) {
           <div className={classes.buttons}>
           
             <Button type="submit" variant="primary"  className= {classes.buttonone}>
-              continue with phone-number
+              Send 
             </Button>
           </div>
         </Form>
 
 
-        <Form onSubmit={verifyOtp} style={{ display: flag ? "flex" : "none", flexDirection:'column', alignItems:'center' }}>
+        <Form onSubmit={verifyOtp} style={{ display: flag ? "block" : "none" }}>
           
-            <input
+            <TextField
               type="otp"
             
-              className={classes.otpinput}
+              className={classes.input}
               placeholder="Enter OTP"
               onChange={(e) => setOtp(e.target.value)}
             />
@@ -606,11 +474,11 @@ if (this.state.phoneNumber && this.state.password ) {
           <div className={classes.buttonss}>
             <Link to="/">
               <Button variant="primary"
-              className={classes.buttonverify}
+              className={classes.buttontwo}
               >Cancel</Button>
             </Link>
           
-            <Button type="submit" variant="primary" className={classes.buttonverify}>
+            <Button type="submit" variant="primary" className={classes.buttontwo}>
               Verify
             </Button>
           </div>
@@ -627,7 +495,7 @@ if (this.state.phoneNumber && this.state.password ) {
               className={classes.texts}
               
             >
-                  Or
+                  Or 
             
             </Typography>
             <Button

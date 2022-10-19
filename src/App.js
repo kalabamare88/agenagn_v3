@@ -18,14 +18,18 @@ import AdminDetail from "./pages/dashboard/Admin-dashboard/AdminDetail";
 import UserList from "./pages/dashboard/Admin-dashboard/UserList";
 import UserDetail from "./pages/dashboard/Admin-dashboard/UserDetail";
 import About from "./pages/About/About";
+import SignupEmail from './pages/Authentication/SignUpEmails';
+import SignUpPhone from "./pages/Authentication/SignupPhone";
 import UpperFooter from "./components/UpperFooter";
 import ForgotPassword from "./pages/Authentication/ForgotPassword";
 import ResetPassword from "./pages/Authentication/ForgotPassword/ResetPassword";
 import { getDashboardData } from "./features/dashboard/dashboardSlice";
 
+
+
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "#fff",
+    backgroundColor: "#EEEEEE",
   },
   mainParts: {
     paddingTop: "100px",
@@ -60,6 +64,7 @@ function App() {
 
   return (
     <div className={classes.root}>
+      
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <NavTabs
           // getToken={this.getToken}
@@ -110,6 +115,8 @@ function App() {
               // getToken={getToken}
             />
           </Route>
+
+
           <Route path="/signup" exact>
             {" "}
             <Signup
@@ -118,6 +125,25 @@ function App() {
               // getToken={getToken}
             />
           </Route>
+
+          <Route path="/SignUpEmail" exact>
+            {" "}
+            <SignupEmail
+              setSideBar={setSideBar}
+              // setToken={setToken}
+              // getToken={getToken}
+            />
+          </Route>
+
+          <Route path="/SignUpPhone" exact>
+            {" "}
+            <SignUpPhone
+              setSideBar={setSideBar}
+              // setToken={setToken}
+              // getToken={getToken}
+            />
+          </Route>
+          
           <Route path="/dashboard" exact>
             {" "}
             <Dashboard
